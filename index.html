@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sakura Pixel Love - Árbol de Recuerdos de Parejas</title>
-  <meta name="description" content="Página interactiva en Pixel Art con un majestuoso árbol Sakura japonés y marcos de fotos de parejas colgando entre sus ramas.">
-  
+  <meta name="description"
+    content="Página interactiva en Pixel Art con un majestuoso árbol Sakura japonés y marcos de fotos de parejas colgando entre sus ramas.">
+
   <!-- Fuentes Pixel Art de Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap"
+    rel="stylesheet">
+
   <!-- Hojas de Estilo -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- Filtro Retro CRT Opcional -->
   <div class="crt-overlay" id="crt-overlay" aria-hidden="true"></div>
 
   <div id="app-viewport">
-    
+
     <!-- HUD Superior -->
     <header class="pixel-hud-header">
       <div class="hud-title-box">
@@ -44,7 +49,8 @@
     <!-- Escenario del Árbol Sakura -->
     <main class="sakura-stage theme-day" id="sakura-stage">
       <!-- Imagen de fondo pixel art del árbol sakura -->
-      <img src="assets/sakura_tree_bg.jpg" alt="Majestuoso árbol sakura japonés en pixel art" class="sakura-bg-image" id="sakura-bg">
+      <img src="assets/sakura_tree_bg.jpg" alt="Majestuoso árbol sakura japonés en pixel art" class="sakura-bg-image"
+        id="sakura-bg">
 
       <!-- Capa de Canvas para lluvia de pétalos interactiva -->
       <canvas id="sakura-canvas"></canvas>
@@ -120,7 +126,8 @@
     <form id="form-add-couple" class="modal-body" method="dialog">
       <div class="form-group">
         <label class="form-label" for="input-couple-names">NOMBRES DE LA PAREJA:</label>
-        <input type="text" id="input-couple-names" class="pixel-input" placeholder="Ej: Mateo & Bea" required maxlength="30">
+        <input type="text" id="input-couple-names" class="pixel-input" placeholder="Ej: Yoha & Bea" required
+          maxlength="30">
       </div>
 
       <div class="form-group">
@@ -130,7 +137,8 @@
 
       <div class="form-group">
         <label class="form-label" for="input-quote">DEDICATORIA / MENSAJE:</label>
-        <textarea id="input-quote" class="pixel-textarea" rows="2" placeholder="Escribe un lindo recuerdo o promesa bajo el cerezo..." maxlength="120" required></textarea>
+        <textarea id="input-quote" class="pixel-textarea" rows="2"
+          placeholder="Escribe un lindo recuerdo o promesa bajo el cerezo..." maxlength="120" required></textarea>
       </div>
 
       <div class="form-group">
@@ -164,4 +172,5 @@
   <script type="module" src="style.js"></script>
   <script type="module" src="app.js"></script>
 </body>
+
 </html>

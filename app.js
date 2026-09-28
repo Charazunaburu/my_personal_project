@@ -12,7 +12,7 @@ import { PIXEL_PALETTES, applyAtmosphereTheme, PixelAudioSynth } from './style.j
 const INITIAL_COUPLES = [
   {
     id: 'couple-1',
-    names: 'Mateo & Bea',
+    names: 'Yoha & Bea',
     date: '2024-04-12',
     dateFormatted: '12 Abril 2024',
     quote: 'Nuestro paseo soñado bajo los cerezos en flor. Promesa de amor eterno.',
@@ -181,12 +181,12 @@ class SakuraPetalEngine {
 
       // Forma de pétalo pixelado escalonado
       const s = p.size;
-      this.ctx.fillRect(-s, -s/2, s * 2, s);
-      this.ctx.fillRect(-s/2, -s, s, s * 2);
+      this.ctx.fillRect(-s, -s / 2, s * 2, s);
+      this.ctx.fillRect(-s / 2, -s, s, s * 2);
 
       // Borde de sombra sutil pixel art
       this.ctx.fillStyle = 'rgba(219, 39, 119, 0.4)';
-      this.ctx.fillRect(s/2, s/2, 2, 2);
+      this.ctx.fillRect(s / 2, s / 2, 2, 2);
 
       this.ctx.restore();
 
@@ -333,7 +333,7 @@ btnAddCouple?.addEventListener('click', () => {
   currentUploadedImageBase64 = null;
   uploadPreviewImg.style.display = 'none';
   uploadPlaceholderText.style.display = 'block';
-  
+
   // Asignar fecha de hoy por defecto
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('input-date').value = today;
