@@ -1,0 +1,766 @@
+/* ==========================================================================
+   PIXEL ART SAKURA MEMORIES - STYLES
+   Inspirado en el pixel art retro japonés de 16-bits
+   ========================================================================== */
+
+:root {
+  /* Paleta Pixel Art */
+  --pixel-bg-day: #fce7f3;
+  --pixel-sky-day: linear-gradient(180deg, #93c5fd 0%, #fed7aa 60%, #fbcfe8 100%);
+  --pixel-sky-sunset: linear-gradient(180deg, #4c1d95 0%, #db2777 45%, #f97316 75%, #fde047 100%);
+  --pixel-sky-night: linear-gradient(180deg, #090918 0%, #171738 50%, #2e1065 100%);
+
+  --pixel-pink-light: #fbcfe8;
+  --pixel-pink-main: #f472b6;
+  --pixel-pink-dark: #db2777;
+  --pixel-wood-dark: #3f200c;
+  --pixel-wood-mid: #78350f;
+  --pixel-wood-light: #b45309;
+  --pixel-gold: #f59e0b;
+  --pixel-gold-light: #fde047;
+  --pixel-dark: #18181b;
+  --pixel-white: #ffffff;
+  --pixel-cream: #fefce8;
+  --pixel-red: #ef4444;
+
+  /* UI Tokens */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-jp: 'DotGothic16', sans-serif;
+  --font-ui: 'Silkscreen', monospace;
+
+  --pixel-size: 3px;
+  --shadow-pixel: 
+    3px 0 0 var(--pixel-dark),
+    -3px 0 0 var(--pixel-dark),
+    0 3px 0 var(--pixel-dark),
+    0 -3px 0 var(--pixel-dark),
+    6px 6px 0 rgba(0, 0, 0, 0.35);
+  
+  --shadow-pixel-sm: 
+    2px 0 0 var(--pixel-dark),
+    -2px 0 0 var(--pixel-dark),
+    0 2px 0 var(--pixel-dark),
+    0 -2px 0 var(--pixel-dark),
+    3px 3px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Reset y Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+}
+
+body {
+  font-family: var(--font-ui), var(--font-pixel), sans-serif;
+  background-color: var(--pixel-dark);
+  color: var(--pixel-dark);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+  position: relative;
+}
+
+/* Contenedor Principal */
+#app-viewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-height: 600px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   TOP BAR / HUD PIXEL ART
+   ========================================================================== */
+.pixel-hud-header {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.hud-title-box {
+  pointer-events: auto;
+  background: var(--pixel-cream);
+  padding: 8px 14px;
+  border: 3px solid var(--pixel-dark);
+  box-shadow: var(--shadow-pixel);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hud-badge {
+  background: var(--pixel-pink-dark);
+  color: var(--pixel-white);
+  font-family: var(--font-jp);
+  font-size: 16px;
+  padding: 2px 6px;
+  border: 2px solid var(--pixel-dark);
+  letter-spacing: 2px;
+}
+
+.hud-title {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--pixel-dark);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.hud-subtitle {
+  font-size: 9px;
+  color: var(--pixel-pink-dark);
+  letter-spacing: 1px;
+}
+
+.hud-actions {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botones Pixel Art */
+.pixel-btn {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  background: var(--pixel-cream);
+  color: var(--pixel-dark);
+  border: 3px solid var(--pixel-dark);
+  padding: 8px 12px;
+  cursor: pointer;
+  box-shadow: 
+    2px 2px 0 0 var(--pixel-dark),
+    inset -2px -2px 0 0 rgba(0,0,0,0.15),
+    inset 2px 2px 0 0 rgba(255,255,255,0.7);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.08s ease, background 0.15s ease;
+  position: relative;
+}
+
+.pixel-btn:hover {
+  background: var(--pixel-pink-light);
+  transform: translateY(-2px);
+}
+
+.pixel-btn:active {
+  transform: translateY(2px);
+  box-shadow: 
+    0px 0px 0 0 var(--pixel-dark),
+    inset 2px 2px 0 0 rgba(0,0,0,0.25);
+}
+
+.pixel-btn.btn-primary {
+  background: var(--pixel-pink-main);
+  color: var(--pixel-white);
+  text-shadow: 1px 1px 0 var(--pixel-dark);
+}
+
+.pixel-btn.btn-primary:hover {
+  background: var(--pixel-pink-dark);
+}
+
+.pixel-btn.btn-round {
+  padding: 8px;
+  width: 38px;
+  height: 38px;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   ESCENARIO SAKURA & CANVAS
+   ========================================================================== */
+.sakura-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  transition: filter 0.8s ease;
+}
+
+/* Modos de Atmósfera */
+.sakura-stage.theme-day {
+  filter: brightness(1) contrast(1.05);
+}
+
+.sakura-stage.theme-sunset {
+  filter: sepia(0.35) hue-rotate(-15deg) saturate(1.4) brightness(0.92);
+}
+
+.sakura-stage.theme-night {
+  filter: hue-rotate(200deg) saturate(0.8) brightness(0.65) contrast(1.2);
+}
+
+/* Capa de imagen de fondo del árbol */
+.sakura-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  image-rendering: pixelated;
+  z-index: 1;
+}
+
+/* Canvas de Pétalos y Viento */
+#sakura-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   MARCOS DE FOTOS FLOTANTES / COLGANTES EN LAS RAMAS (PIXEL ART)
+   ========================================================================== */
+.frames-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* Cada cuadro colgante */
+.couple-frame-anchor {
+  position: absolute;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+  cursor: pointer;
+  transform-origin: top center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Cuerda roja tradicional colgante */
+.hanging-rope {
+  width: 3px;
+  height: 38px;
+  background: var(--pixel-red);
+  margin: 0 auto;
+  box-shadow: 1px 0 0 var(--pixel-dark);
+  position: relative;
+}
+
+.hanging-rope::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -3px;
+  width: 9px;
+  height: 6px;
+  background: var(--pixel-gold);
+  border: 1px solid var(--pixel-dark);
+  border-radius: 2px;
+}
+
+.hanging-rope::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: -2px;
+  width: 7px;
+  height: 7px;
+  background: var(--pixel-gold-light);
+  border: 1px solid var(--pixel-dark);
+  border-radius: 50%;
+}
+
+/* Marco de Foto Estilo Polaroid Retro Pixel Art */
+.photo-card {
+  width: 130px;
+  background: var(--pixel-cream);
+  border: 3px solid var(--pixel-dark);
+  box-shadow: var(--shadow-pixel);
+  padding: 6px 6px 10px 6px;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.couple-frame-anchor:hover .photo-card {
+  transform: scale(1.12) rotate(2deg);
+  box-shadow: 
+    4px 0 0 var(--pixel-pink-main),
+    -4px 0 0 var(--pixel-pink-main),
+    0 4px 0 var(--pixel-pink-main),
+    0 -4px 0 var(--pixel-pink-main),
+    8px 8px 0 rgba(0, 0, 0, 0.45);
+}
+
+.couple-frame-anchor:hover {
+  animation-play-state: paused;
+}
+
+/* Animación de vaivén de las ramas */
+@keyframes swayBranch1 {
+  0%, 100% { transform: translate(-50%, 0) rotate(-2.5deg); }
+  50% { transform: translate(-50%, 0) rotate(3deg); }
+}
+
+@keyframes swayBranch2 {
+  0%, 100% { transform: translate(-50%, 0) rotate(3.5deg); }
+  50% { transform: translate(-50%, 0) rotate(-2deg); }
+}
+
+@keyframes swayBranch3 {
+  0%, 100% { transform: translate(-50%, 0) rotate(-1.5deg); }
+  50% { transform: translate(-50%, 0) rotate(2deg); }
+}
+
+.sway-1 { animation: swayBranch1 4.5s ease-in-out infinite; }
+.sway-2 { animation: swayBranch2 5.2s ease-in-out infinite; }
+.sway-3 { animation: swayBranch3 3.8s ease-in-out infinite; }
+
+/* Imagen dentro del marco */
+.photo-img-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 2px solid var(--pixel-dark);
+  background: #333;
+  position: relative;
+}
+
+.photo-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  display: block;
+}
+
+/* Corazón flotante sobre la foto */
+.photo-heart-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--pixel-white);
+  border: 1px solid var(--pixel-dark);
+  font-size: 10px;
+  padding: 1px 3px;
+  border-radius: 2px;
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+}
+
+/* Pie de foto pixel art */
+.photo-caption {
+  margin-top: 6px;
+  text-align: center;
+}
+
+.photo-couple-names {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--pixel-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.photo-date-tag {
+  font-size: 7px;
+  color: var(--pixel-pink-dark);
+  display: block;
+  margin-top: 3px;
+  font-weight: bold;
+}
+
+/* Cinta decorativa superior (Washi Tape pixel) */
+.washi-tape {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 12px;
+  background: rgba(244, 114, 182, 0.85);
+  border: 1px dashed var(--pixel-dark);
+  z-index: 2;
+}
+
+/* ==========================================================================
+   HUD INFERIOR / CONTROLES
+   ========================================================================== */
+.pixel-hud-footer {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.hud-control-group {
+  pointer-events: auto;
+  background: var(--pixel-cream);
+  padding: 6px 10px;
+  border: 3px solid var(--pixel-dark);
+  box-shadow: var(--shadow-pixel);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-label {
+  font-size: 8px;
+  color: var(--pixel-dark);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Selector de Clima/Tiempo */
+.theme-selector-btn {
+  background: var(--pixel-white);
+  border: 2px solid var(--pixel-dark);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.theme-selector-btn.active {
+  background: var(--pixel-pink-main);
+  color: var(--pixel-white);
+}
+
+/* Indicador de Música BGM */
+.music-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.equalizer-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.eq-bar {
+  width: 3px;
+  background: var(--pixel-pink-dark);
+  height: 4px;
+}
+
+.music-toggle.playing .eq-bar:nth-child(1) { animation: eqJump 0.6s infinite ease-in-out; }
+.music-toggle.playing .eq-bar:nth-child(2) { animation: eqJump 0.8s infinite ease-in-out 0.2s; }
+.music-toggle.playing .eq-bar:nth-child(3) { animation: eqJump 0.5s infinite ease-in-out 0.4s; }
+
+@keyframes eqJump {
+  0%, 100% { height: 3px; }
+  50% { height: 12px; }
+}
+
+/* ==========================================================================
+   MODAL DIALOG (CUMPLE GUÍAS MODERNAS CSS / POP-OVER)
+   ========================================================================== */
+dialog.pixel-modal {
+  margin: auto;
+  border: 4px solid var(--pixel-dark);
+  background: var(--pixel-cream);
+  padding: 0;
+  box-shadow: 
+    0 0 0 100vmax rgba(0, 0, 0, 0.6),
+    8px 8px 0 var(--pixel-dark);
+  max-width: 460px;
+  width: 90vw;
+  overflow: visible;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  /* Transiciones modernas hacia/desde Top Layer */
+  opacity: 0;
+  transform: scale(0.9) translateY(12px);
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 0.25s;
+  transition-timing-function: cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  transition-behavior: allow-discrete;
+}
+
+dialog.pixel-modal[open] {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+}
+
+dialog.pixel-modal::backdrop {
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(2px);
+  transition:
+    display 0.25s allow-discrete,
+    overlay 0.25s allow-discrete,
+    background-color 0.25s ease-out;
+}
+
+dialog.pixel-modal[open]::backdrop {
+  background-color: rgba(15, 7, 24, 0.65);
+
+  @starting-style {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+.modal-header {
+  background: var(--pixel-pink-main);
+  color: var(--pixel-white);
+  padding: 10px 14px;
+  border-bottom: 3px solid var(--pixel-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0 var(--pixel-dark);
+}
+
+.modal-close-btn {
+  background: var(--pixel-dark);
+  color: var(--pixel-white);
+  border: none;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+.modal-close-btn:hover {
+  background: var(--pixel-red);
+}
+
+.modal-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Contenido de detalle de la foto */
+.modal-photo-preview {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 3px solid var(--pixel-dark);
+  box-shadow: var(--shadow-pixel-sm);
+  background: #222;
+  overflow: hidden;
+  position: relative;
+}
+
+.modal-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.modal-meta-box {
+  background: #fff;
+  border: 2px solid var(--pixel-dark);
+  padding: 10px 12px;
+}
+
+.modal-couple-names {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--pixel-pink-dark);
+  margin-bottom: 6px;
+}
+
+.modal-date-tag {
+  font-size: 9px;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.modal-quote-text {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #333;
+  font-style: italic;
+  border-left: 3px solid var(--pixel-pink-main);
+  padding-left: 8px;
+}
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.love-counter-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--pixel-pink-dark);
+}
+
+/* ==========================================================================
+   FORMULARIO: COLGAR NUEVA PAREJA
+   ========================================================================== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-label {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--pixel-dark);
+}
+
+.pixel-input, .pixel-textarea, .pixel-select {
+  font-family: var(--font-ui), sans-serif;
+  font-size: 11px;
+  padding: 8px 10px;
+  border: 2px solid var(--pixel-dark);
+  background: #fff;
+  color: var(--pixel-dark);
+  outline: none;
+}
+
+.pixel-input:focus, .pixel-textarea:focus, .pixel-select:focus {
+  border-color: var(--pixel-pink-dark);
+  box-shadow: 0 0 0 2px var(--pixel-pink-light);
+}
+
+.file-upload-preview {
+  width: 100%;
+  height: 120px;
+  border: 2px dashed var(--pixel-pink-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(251, 207, 232, 0.2);
+  text-align: center;
+  padding: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload-preview img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   EFECTO SCANLINES CRT (OPCIONAL RETRO)
+   ========================================================================== */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 80;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.04),
+    rgba(0, 255, 0, 0.02),
+    rgba(0, 0, 255, 0.04)
+  );
+  background-size: 100% 3px, 4px 100%;
+  opacity: 0.65;
+  display: none;
+}
+
+body.crt-active .crt-overlay {
+  display: block;
+}
+
+/* Partículas de corazón flotante */
+.floating-pixel-heart {
+  position: fixed;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: var(--pixel-pink-dark);
+  pointer-events: none;
+  z-index: 150;
+  animation: floatUp 1.2s forwards cubic-bezier(0.22, 1, 0.36, 1);
+  text-shadow: 1px 1px 0 #fff;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-70px) scale(1.4);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .photo-card {
+    width: 95px;
+    padding: 4px 4px 8px 4px;
+  }
+  .hud-title {
+    font-size: 9px;
+  }
+  .pixel-hud-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .hud-actions {
+    justify-content: flex-end;
+  }
+  .hanging-rope {
+    height: 25px;
+  }
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sakura Pixel Love - Árbol de Recuerdos de Parejas</title>
+  <meta name="description" content="Página interactiva en Pixel Art con un majestuoso árbol Sakura japonés y marcos de fotos de parejas colgando entre sus ramas.">
+  
+  <!-- Fuentes Pixel Art de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Hojas de Estilo -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Filtro Retro CRT Opcional -->
+  <div class="crt-overlay" id="crt-overlay" aria-hidden="true"></div>
+
+  <div id="app-viewport">
+    
+    <!-- HUD Superior -->
+    <header class="pixel-hud-header">
+      <div class="hud-title-box">
+        <span class="hud-badge">桜 恋</span>
+        <div>
+          <h1 class="hud-title">SAKURA PIXEL LOVE</h1>
+          <span class="hud-subtitle">ÁRBOL DE RECUERDOS • 恋人の木</span>
+        </div>
+      </div>
+
+      <nav class="hud-actions" aria-label="Acciones principales">
+        <button id="btn-add-couple" class="pixel-btn btn-primary" title="Colgar una foto de pareja en el árbol">
+          <span>+</span> COLGAR FOTO
+        </button>
+        <button id="btn-toggle-crt" class="pixel-btn" title="Alternar filtro retro CRT Scanlines">
+          📺 CRT
+        </button>
+      </nav>
+    </header>
+
+    <!-- Escenario del Árbol Sakura -->
+    <main class="sakura-stage theme-day" id="sakura-stage">
+      <!-- Imagen de fondo pixel art del árbol sakura -->
+      <img src="assets/sakura_tree_bg.jpg" alt="Majestuoso árbol sakura japonés en pixel art" class="sakura-bg-image" id="sakura-bg">
+
+      <!-- Capa de Canvas para lluvia de pétalos interactiva -->
+      <canvas id="sakura-canvas"></canvas>
+
+      <!-- Capa de Marcos de Fotos Colgantes en las Ramas -->
+      <section class="frames-container" id="frames-layer" aria-label="Galería de marcos de parejas"></section>
+    </main>
+
+    <!-- HUD Inferior / Controles -->
+    <footer class="pixel-hud-footer">
+      <div class="hud-control-group" aria-label="Selector de momento del día">
+        <span class="hud-label">TIEMPO:</span>
+        <button class="theme-selector-btn active" data-theme="day" id="btn-theme-day">☀️ DÍA</button>
+        <button class="theme-selector-btn" data-theme="sunset" id="btn-theme-sunset">🌇 TARDE</button>
+        <button class="theme-selector-btn" data-theme="night" id="btn-theme-night">🌙 NOCHE</button>
+      </div>
+
+      <div class="hud-control-group" aria-label="Controles de ambiente y música">
+        <button id="btn-wind-toggle" class="pixel-btn" title="Aumentar o calmar el viento">
+          🍃 VIENTO: NORMAL
+        </button>
+
+        <button id="btn-music-toggle" class="pixel-btn music-toggle" title="Música retro de fondo 8-bit">
+          <span>🎵 8-BIT BGM</span>
+          <div class="equalizer-bars" aria-hidden="true">
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+          </div>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- =======================================================================
+       MODAL 1: VER DETALLE DEL RECUERDO DE PAREJA
+       ======================================================================= -->
+  <dialog id="photo-dialog" class="pixel-modal" aria-labelledby="dialog-title">
+    <div class="modal-header">
+      <h2 class="modal-title" id="dialog-title">RECUERDO ETERNO</h2>
+      <button class="modal-close-btn" id="btn-close-view" aria-label="Cerrar modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-photo-preview">
+        <img id="view-photo-img" src="" alt="Foto de pareja en pixel art">
+      </div>
+      <div class="modal-meta-box">
+        <h3 class="modal-couple-names" id="view-couple-names">Nombres</h3>
+        <p class="modal-date-tag" id="view-date-tag">Fecha</p>
+        <p class="modal-quote-text" id="view-quote-text">Mensaje</p>
+      </div>
+      <div class="modal-footer-actions">
+        <div class="love-counter-box">
+          <span>AMOR:</span>
+          <span id="view-love-count">0</span>
+        </div>
+        <button id="btn-give-love" class="pixel-btn btn-primary">
+          ❤️ DAR AMOR
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =======================================================================
+       MODAL 2: COLGAR NUEVA FOTO / PAREJA
+       ======================================================================= -->
+  <dialog id="add-dialog" class="pixel-modal" aria-labelledby="add-dialog-title">
+    <div class="modal-header">
+      <h2 class="modal-title" id="add-dialog-title">🌸 COLGAR EN EL SAKURA</h2>
+      <button class="modal-close-btn" id="btn-close-add" aria-label="Cerrar modal">✕</button>
+    </div>
+    <form id="form-add-couple" class="modal-body" method="dialog">
+      <div class="form-group">
+        <label class="form-label" for="input-couple-names">NOMBRES DE LA PAREJA:</label>
+        <input type="text" id="input-couple-names" class="pixel-input" placeholder="Ej: Mateo & Bea" required maxlength="30">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-date">FECHA ESPECIAL / ANIVERSARIO:</label>
+        <input type="date" id="input-date" class="pixel-input" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-quote">DEDICATORIA / MENSAJE:</label>
+        <textarea id="input-quote" class="pixel-textarea" rows="2" placeholder="Escribe un lindo recuerdo o promesa bajo el cerezo..." maxlength="120" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">SELECCIONAR O SUBIR FOTO:</label>
+        <div class="file-upload-preview" id="upload-preview-area" title="Haz clic para subir tu propia foto o imagen">
+          <span id="upload-placeholder-text">📷 Clic para subir foto (o usar predeterminada)</span>
+          <img id="upload-preview-img" src="" alt="Previsualización" style="display: none;">
+        </div>
+        <input type="file" id="input-photo-file" accept="image/*" style="display: none;">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="select-branch">RAMA DEL ÁRBOL SAKURA:</label>
+        <select id="select-branch" class="pixel-select">
+          <option value="left-high">Rama Izquierda Alta</option>
+          <option value="left-mid">Rama Izquierda Media</option>
+          <option value="center-high" selected>Rama Central Florida</option>
+          <option value="right-high">Rama Derecha Alta</option>
+          <option value="right-mid">Rama Derecha Cerca del Río</option>
+        </select>
+      </div>
+
+      <div class="modal-footer-actions" style="margin-top: 10px;">
+        <button type="button" class="pixel-btn" id="btn-cancel-add">CANCELAR</button>
+        <button type="submit" class="pixel-btn btn-primary" id="btn-submit-couple">🌸 COLGAR RECUERDO</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Módulos de Script -->
+  <script type="module" src="style.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
