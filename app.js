@@ -15,68 +15,71 @@ const INITIAL_COUPLES = [
     names: 'Yoha & Bea',
     date: '2024-04-12',
     dateFormatted: '12 Abril 2024',
-    quote: 'Nuestro paseo soñado bajo los cerezos en flor. Promesa de amor eterno.',
-    image: 'assets/couple_1.jpg',
+    title: 'Cita en El Espino',
+    quote: 'Rodeados de naturaleza, aire fresco y la sonrisa más hermosa del mundo. Cada instante a tu lado se siente como el mejor día.',
+    image: 'assets/Cita_espino_01.jpg',
     posX: 22, // % de ancho
     posY: 16, // % de alto
-    swayType: 'sway-1',
-    likes: 42
+    swayType: 'sway-1'
   },
   {
     id: 'couple-2',
-    names: 'Ren & Sakura',
-    date: '2023-07-20',
-    dateFormatted: '20 Julio 2023',
-    quote: 'Compartiendo el paraguas bajo los farolillos de Kioto en una noche mágica.',
-    image: 'assets/couple_2.jpg',
+    names: 'Yoha & Bea',
+    date: '2024-04-12',
+    dateFormatted: '12 Abril 2024',
+    title: 'Sendero en El Espino',
+    quote: 'Caminando entre los senderos verdes de El Espino. No importa lo largo del camino mientras sea de tu mano.',
+    image: 'assets/Cita_espino_02.jpg',
     posX: 38,
     posY: 25,
-    swayType: 'sway-2',
-    likes: 88
+    swayType: 'sway-2'
   },
   {
     id: 'couple-3',
-    names: 'Kenji & Hana',
-    date: '2023-10-05',
-    dateFormatted: '5 Octubre 2023',
-    quote: 'Mirando el monte Fuji al atardecer, donde el tiempo se detuvo para nosotros.',
-    image: 'assets/couple_3.jpg',
+    names: 'Yoha & Bea',
+    date: '2024-05-18',
+    dateFormatted: '18 Mayo 2024',
+    title: 'Noche de Pizza',
+    quote: 'Cena romántica, pizza deliciosa y risas que alegran el alma. Verte sonreír hace que cualquier momento sea mágico.',
+    image: 'assets/Cita_pizza.jpg',
     posX: 58,
     posY: 14,
-    swayType: 'sway-3',
-    likes: 67
+    swayType: 'sway-3'
   },
   {
     id: 'couple-4',
-    names: 'Hiro & Emi',
-    date: '2024-03-30',
-    dateFormatted: '30 Marzo 2024',
-    quote: 'Una selfie llena de risas bajo las ramas más altas del árbol sagrado.',
-    image: 'assets/couple_4.jpg',
+    names: 'Yoha & Bea',
+    date: '2024-06-22',
+    dateFormatted: '22 Junio 2024',
+    title: 'Cita de Postre & Espejo',
+    quote: 'Combinando de rojo, endulzando el día con un rico postre y guardando este recuerdo frente al espejo para siempre.',
+    image: 'assets/Cita_postre.jpg',
     posX: 77,
     posY: 22,
-    swayType: 'sway-1',
-    likes: 53
+    swayType: 'sway-1'
   },
   {
     id: 'couple-5',
-    names: 'Yuki & Kaito',
-    date: '2024-01-14',
-    dateFormatted: '14 Enero 2024',
-    quote: 'Compartiendo pastelitos de taiyaki recién horneados con el primer deshielo.',
-    image: 'assets/couple_5.jpg',
+    names: 'Yoha & Bea',
+    date: '2024-07-15',
+    dateFormatted: '15 Julio 2024',
+    title: 'Cita de Sushi en SOHO',
+    quote: 'Esperando nuestro sushi favorito en SOHO. Buena comida, miradas cómplices y la mejor compañía de mi vida.',
+    image: 'assets/Cita_sushi.jpg',
     posX: 48,
     posY: 34,
-    swayType: 'sway-2',
-    likes: 95
+    swayType: 'sway-2'
   }
 ];
 
 // Almacenamiento local para parejas personalizadas
 function getStoredCouples() {
   try {
-    const raw = localStorage.getItem('sakura_couples_list');
-    return raw ? JSON.parse(raw) : INITIAL_COUPLES;
+    const raw = localStorage.getItem('sakura_couples_list_v3');
+    if (raw) return JSON.parse(raw);
+
+    // Cargar recuerdos actualizados sin likes
+    return INITIAL_COUPLES;
   } catch (e) {
     console.warn('No se pudo acceder a localStorage:', e);
     return INITIAL_COUPLES;
@@ -85,7 +88,7 @@ function getStoredCouples() {
 
 function saveCouples(couples) {
   try {
-    localStorage.setItem('sakura_couples_list', JSON.stringify(couples));
+    localStorage.setItem('sakura_couples_list_v3', JSON.stringify(couples));
   } catch (e) {
     console.warn('Error al guardar en localStorage:', e);
   }
@@ -223,11 +226,10 @@ function renderFramesLayer(couples) {
         <div class="washi-tape"></div>
         <div class="photo-img-wrapper">
           <img src="${couple.image}" alt="${couple.names}" class="photo-thumbnail" loading="lazy">
-          <span class="photo-heart-badge">❤️ ${couple.likes}</span>
         </div>
         <div class="photo-caption">
           <strong class="photo-couple-names">${couple.names}</strong>
-          <span class="photo-date-tag">${couple.dateFormatted || couple.date}</span>
+          <span class="photo-date-tag">${couple.title || couple.dateFormatted || couple.date}</span>
         </div>
       </div>
     `;
@@ -256,47 +258,28 @@ function openCoupleModal(couple) {
   activeCouple = couple;
   audioSynth.playChime();
 
+  const titleEl = document.getElementById('dialog-title');
+  if (titleEl) {
+    titleEl.textContent = couple.title ? `🌸 ${couple.title.toUpperCase()}` : 'RECUERDO ETERNO';
+  }
+
   document.getElementById('view-photo-img').src = couple.image;
   document.getElementById('view-photo-img').alt = `Fotografía de ${couple.names}`;
   document.getElementById('view-couple-names').textContent = couple.names;
   document.getElementById('view-date-tag').textContent = `📅 ${couple.dateFormatted || couple.date}`;
   document.getElementById('view-quote-text').textContent = `"${couple.quote}"`;
-  document.getElementById('view-love-count').textContent = couple.likes || 0;
 
   if (photoDialog && typeof photoDialog.showModal === 'function') {
     photoDialog.showModal();
   }
 }
 
-// Botón de Dar Amor ❤️
-document.getElementById('btn-give-love')?.addEventListener('click', (e) => {
-  if (!activeCouple) return;
-  activeCouple.likes = (activeCouple.likes || 0) + 1;
-  document.getElementById('view-love-count').textContent = activeCouple.likes;
-
-  audioSynth.playHeartSound();
-  saveCouples(couplesData);
-  renderFramesLayer(couplesData);
-
-  // Efecto de corazón pixel flotante
-  createFloatingHeart(e.clientX, e.clientY);
-});
-
-function createFloatingHeart(x, y) {
-  const heart = document.createElement('div');
-  heart.className = 'floating-pixel-heart';
-  heart.textContent = '❤️ +1';
-  heart.style.left = `${x - 15}px`;
-  heart.style.top = `${y - 25}px`;
-  document.body.appendChild(heart);
-
-  setTimeout(() => {
-    heart.remove();
-  }, 1200);
-}
-
 // Cierre de modales
 document.getElementById('btn-close-view')?.addEventListener('click', () => {
+  photoDialog.close();
+});
+
+document.getElementById('btn-close-view-footer')?.addEventListener('click', () => {
   photoDialog.close();
 });
 
@@ -385,11 +368,11 @@ formAddCouple?.addEventListener('submit', (e) => {
 
   // Si no subió foto propia, alternar entre las existentes
   const fallbackImages = [
-    'assets/couple_1.jpg',
-    'assets/couple_2.jpg',
-    'assets/couple_3.jpg',
-    'assets/couple_4.jpg',
-    'assets/couple_5.jpg'
+    'assets/Cita_espino_01.jpg',
+    'assets/Cita_espino_02.jpg',
+    'assets/Cita_pizza.jpg',
+    'assets/Cita_postre.jpg',
+    'assets/Cita_sushi.jpg'
   ];
   const finalImage = currentUploadedImageBase64 || fallbackImages[couplesData.length % fallbackImages.length];
 
@@ -405,8 +388,7 @@ formAddCouple?.addEventListener('submit', (e) => {
     image: finalImage,
     posX: branchInfo.x + (Math.random() * 4 - 2), // Leve variación natural
     posY: branchInfo.y + (Math.random() * 4 - 2),
-    swayType: branchInfo.sway,
-    likes: 1
+    swayType: branchInfo.sway
   };
 
   couplesData.push(newCouple);

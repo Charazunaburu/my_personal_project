@@ -347,22 +347,11 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  image-rendering: pixelated;
+  object-position: center;
+  image-rendering: auto;
   display: block;
 }
 
-/* Corazón flotante sobre la foto */
-.photo-heart-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: var(--pixel-white);
-  border: 1px solid var(--pixel-dark);
-  font-size: 10px;
-  padding: 1px 3px;
-  border-radius: 2px;
-  box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
-}
 
 /* Pie de foto pixel art */
 .photo-caption {
@@ -590,7 +579,8 @@ dialog.pixel-modal[open]::backdrop {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  image-rendering: pixelated;
+  object-position: center;
+  image-rendering: auto;
   display: block;
 }
 
@@ -630,14 +620,6 @@ dialog.pixel-modal[open]::backdrop {
   margin-top: 4px;
 }
 
-.love-counter-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  color: var(--pixel-pink-dark);
-}
 
 /* ==========================================================================
    FORMULARIO: COLGAR NUEVA PAREJA
@@ -720,28 +702,6 @@ body.crt-active .crt-overlay {
   display: block;
 }
 
-/* Partículas de corazón flotante */
-.floating-pixel-heart {
-  position: fixed;
-  font-family: var(--font-pixel);
-  font-size: 14px;
-  color: var(--pixel-pink-dark);
-  pointer-events: none;
-  z-index: 150;
-  animation: floatUp 1.2s forwards cubic-bezier(0.22, 1, 0.36, 1);
-  text-shadow: 1px 1px 0 #fff;
-}
-
-@keyframes floatUp {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(0.8);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-70px) scale(1.4);
-  }
-}
 
 /* Responsive */
 @media (max-width: 768px) {
