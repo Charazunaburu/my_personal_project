@@ -1324,25 +1324,48 @@ kbd {
   50% { transform: scale(1.02, 0.97); }
 }
 
-/* Ciclo de caminata expresivo y dinámico */
+/* Ciclo de caminata: paso rítmico retro coordinado con la alternancia de piernas */
 .character-bea.walking .bea-sprite-img {
-  animation: beaWalkStep 0.28s steps(2) infinite alternate;
+  animation: beaWalkStep 0.44s steps(2) infinite;
 }
 
 @keyframes beaWalkStep {
-  0% {
-    transform: translateY(0) rotate(-3.5deg) scale(1.02, 0.98);
+  0%, 100% {
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(-8px) rotate(0deg) scale(0.97, 1.03);
-  }
-  100% {
-    transform: translateY(0) rotate(3.5deg) scale(1.02, 0.98);
+    transform: translateY(-2px);
   }
 }
 
+/* Pulso y compresión de la sombra al caminar */
+.character-bea.walking .bea-shadow {
+  animation: beaShadowPulse 0.48s infinite ease-in-out;
+}
+
+@keyframes beaShadowPulse {
+  0%, 50%, 100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  25%, 75% {
+    transform: scale(0.82);
+    opacity: 0.38;
+  }
+}
+
+/* Balanceo de etiqueta de nombre al caminar */
+.character-bea.walking .bea-name-tag {
+  animation: beaTagSway 0.48s infinite ease-in-out;
+}
+
+@keyframes beaTagSway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
 .character-bea.jumping .bea-sprite-img {
-  transform: translateY(-12px) scale(0.92, 1.08);
+  transform: translateY(-14px) scale(0.92, 1.08);
 }
 
 .character-bea.facing-left .bea-sprite-container {

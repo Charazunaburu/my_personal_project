@@ -449,77 +449,30 @@ btnToggleCrt?.addEventListener('click', () => {
 });
 
 /* ==========================================================================
-   PROCESAMIENTO DE TRANSPARENCIA PARA EL SPRITE DE BEA
+   GESTIÓN Y PRECARGA DE SPRITES DE BEA (IDLE + CICLO DE CAMINATA 4 CUADROS)
    ========================================================================== */
+const BEA_SPRITES = {
+  idle: 'assets/bea_idle.png',
+  walk: [
+    'assets/bea_walk_1.png',
+    'assets/bea_walk_2.png',
+    'assets/bea_walk_3.png',
+    'assets/bea_walk_4.png'
+  ],
+  jump: 'assets/bea_walk_1.png'
+};
+
 function processBeaSprite() {
-  const img = new Image();
-  img.src = 'assets/bea_character.jpg';
-  img.onload = () => {
-    try {
-      const srcCanvas = document.createElement('canvas');
-      const w = img.naturalWidth || 1024;
-      const h = img.naturalHeight || 1024;
-      srcCanvas.width = w;
-      srcCanvas.height = h;
-      const srcCtx = srcCanvas.getContext('2d');
-      srcCtx.drawImage(img, 0, 0);
+  // Precargar todos los cuadros para que no haya micro-parpadeos al caminar
+  const allUrls = [BEA_SPRITES.idle, ...BEA_SPRITES.walk];
+  allUrls.forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
 
-      const imgData = srcCtx.getImageData(0, 0, w, h);
-      const data = imgData.data;
-
-      let minX = w, maxX = 0, minY = h, maxY = 0;
-
-      // Quitar fondo blanco/claro y encontrar el bounding box exacto de Bea
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const idx = (y * w + x) * 4;
-          const r = data[idx];
-          const g = data[idx + 1];
-          const b = data[idx + 2];
-          // Considerar transparente si es fondo claro
-          if (r > 225 && g > 225 && b > 225) {
-            data[idx + 3] = 0;
-          } else if (data[idx + 3] > 10) {
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
-        }
-      }
-
-      srcCtx.putImageData(imgData, 0, 0);
-
-      // Si se detectó el personaje, recortar ajustado exactamente a sus pies y cabeza
-      if (maxX > minX && maxY > minY) {
-        const cropW = maxX - minX + 1;
-        const cropH = maxY - minY + 1;
-
-        const cropCanvas = document.createElement('canvas');
-        cropCanvas.width = cropW;
-        cropCanvas.height = cropH;
-        const cropCtx = cropCanvas.getContext('2d');
-
-        cropCtx.drawImage(
-          srcCanvas,
-          minX, minY, cropW, cropH,
-          0, 0, cropW, cropH
-        );
-
-        const croppedTransparentUrl = cropCanvas.toDataURL('image/png');
-        document.querySelectorAll('.bea-sprite-img, .start-bea-preview').forEach(el => {
-          el.src = croppedTransparentUrl;
-        });
-      } else {
-        const transparentUrl = srcCanvas.toDataURL('image/png');
-        document.querySelectorAll('.bea-sprite-img, .start-bea-preview').forEach(el => {
-          el.src = transparentUrl;
-        });
-      }
-    } catch (err) {
-      console.warn('Aviso: el sprite usará imagen original:', err);
-    }
-  };
+  document.querySelectorAll('.bea-sprite-img, .start-bea-preview').forEach(el => {
+    el.src = BEA_SPRITES.idle;
+  });
 }
 
 /* ==========================================================================
@@ -541,6 +494,12 @@ class BeaCharacterController {
     this.facing = 'right';
     this.isMoving = false;
     this.nearbyCouple = null;
+
+    // Referencia al sprite y gestión de fotogramas de caminata
+    this.spriteImg = this.el?.querySelector('.bea-sprite-img') || document.getElementById('bea-sprite-img');
+    this.walkFrameIndex = 0;
+    this.walkTick = 0;
+    this.currentFrameSrc = BEA_SPRITES.idle;
 
     // Teclas
     this.keys = {
@@ -781,6 +740,44 @@ class BeaCharacterController {
     this.el.classList.toggle('idle', !movingNow && this.isGrounded);
     this.el.classList.toggle('jumping', !this.isGrounded);
     this.el.classList.toggle('facing-left', this.facing === 'left');
+
+    // Actualizar animación de sprites auténtica (caminado cuadro por cuadro)
+    if (!this.spriteImg || !this.spriteImg.isConnected) {
+      this.spriteImg = this.el?.querySelector('.bea-sprite-img') || document.getElementById('bea-sprite-img');
+    }
+
+    if (movingNow && this.isGrounded) {
+      if (this.currentFrameSrc === BEA_SPRITES.idle) {
+        // Al comenzar a caminar, iniciar de inmediato con el paso 1
+        this.walkFrameIndex = 0;
+        this.walkTick = 0;
+        const firstSrc = BEA_SPRITES.walk[0];
+        if (this.spriteImg) {
+          this.spriteImg.src = firstSrc;
+          this.currentFrameSrc = firstSrc;
+        }
+      } else {
+        this.walkTick++;
+        // Cambiar de fotograma cada 7 ticks (~115ms a 60 FPS)
+        if (this.walkTick >= 7) {
+          this.walkTick = 0;
+          this.walkFrameIndex = (this.walkFrameIndex + 1) % BEA_SPRITES.walk.length;
+          const nextSrc = BEA_SPRITES.walk[this.walkFrameIndex];
+          if (this.spriteImg && this.currentFrameSrc !== nextSrc) {
+            this.spriteImg.src = nextSrc;
+            this.currentFrameSrc = nextSrc;
+          }
+        }
+      }
+    } else {
+      this.walkTick = 0;
+      this.walkFrameIndex = 0;
+      const targetSrc = !this.isGrounded ? BEA_SPRITES.jump : BEA_SPRITES.idle;
+      if (this.spriteImg && this.currentFrameSrc !== targetSrc) {
+        this.spriteImg.src = targetSrc;
+        this.currentFrameSrc = targetSrc;
+      }
+    }
 
     this.checkProximity();
 
