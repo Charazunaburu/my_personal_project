@@ -394,6 +394,9 @@ formAddCouple?.addEventListener('submit', (e) => {
   couplesData.push(newCouple);
   saveCouples(couplesData);
   renderFramesLayer(couplesData);
+  if (beaController) {
+    beaController.couples = couplesData;
+  }
 
   audioSynth.playChime();
   addDialog.close();
@@ -446,8 +449,450 @@ btnToggleCrt?.addEventListener('click', () => {
 });
 
 /* ==========================================================================
+   PROCESAMIENTO DE TRANSPARENCIA PARA EL SPRITE DE BEA
+   ========================================================================== */
+function processBeaSprite() {
+  const img = new Image();
+  img.src = 'assets/bea_character.jpg';
+  img.onload = () => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth || 512;
+      canvas.height = img.naturalHeight || 512;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+
+      // Quitar fondo blanco/claro para dejar transparencia perfecta
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        if (r > 230 && g > 230 && b > 230) {
+          data[i + 3] = 0;
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+      const transparentUrl = canvas.toDataURL('image/png');
+
+      document.querySelectorAll('.bea-sprite-img, .start-bea-preview').forEach(el => {
+        el.src = transparentUrl;
+      });
+    } catch (err) {
+      console.warn('Aviso: el sprite usará imagen original:', err);
+    }
+  };
+}
+
+/* ==========================================================================
+   PERSONAJE 2D: CONTROLADOR DE BEA Y MOVIMIENTO EN EL ESCENARIO
+   ========================================================================== */
+class BeaCharacterController {
+  constructor(element, couples) {
+    this.el = element;
+    this.couples = couples;
+    this.speechBubble = document.getElementById('bea-speech-bubble');
+    this.bubbleText = document.getElementById('bubble-text');
+
+    // Estado físico
+    this.posX = 26; // % horizontal inicial
+    this.offsetY = 0; // px vertical (salto)
+    this.velY = 0;
+    this.speed = 0.52; // % por fotograma
+    this.isGrounded = true;
+    this.facing = 'right';
+    this.isMoving = false;
+    this.nearbyCouple = null;
+
+    // Teclas
+    this.keys = {
+      left: false,
+      right: false,
+      jump: false
+    };
+
+    this.targetPosX = null; // Para clic/tap en el sendero
+    this.stepCounter = 0;
+
+    this.initControls();
+    this.animate();
+  }
+
+  initControls() {
+    window.addEventListener('keydown', (e) => {
+      // Ignorar si un diálogo modal está abierto
+      if (document.querySelector('dialog[open]')) return;
+
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        this.keys.left = true;
+        this.targetPosX = null;
+      }
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        this.keys.right = true;
+        this.targetPosX = null;
+      }
+      if ((e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') && this.isGrounded) {
+        e.preventDefault();
+        this.jump();
+      }
+      if (e.code === 'KeyE' || e.code === 'Enter') {
+        if (currentLevel === 'tree' && this.nearbyCouple) {
+          e.preventDefault();
+          openCoupleModal(this.nearbyCouple);
+        } else if (currentLevel === 'france' && this.posX >= 86) {
+          e.preventDefault();
+          switchLevel('tree');
+        } else if (currentLevel === 'tree' && this.posX <= 8) {
+          e.preventDefault();
+          switchLevel('france');
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') this.keys.left = false;
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') this.keys.right = false;
+      if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') this.keys.jump = false;
+    });
+
+    // Controles táctiles en pantalla
+    const btnLeft = document.getElementById('btn-touch-left');
+    const btnRight = document.getElementById('btn-touch-right');
+    const btnJump = document.getElementById('btn-touch-jump');
+
+    const bindTouch = (btn, key) => {
+      if (!btn) return;
+      const start = (e) => { e.preventDefault(); this.keys[key] = true; this.targetPosX = null; };
+      const end = (e) => { e.preventDefault(); this.keys[key] = false; };
+      btn.addEventListener('pointerdown', start);
+      btn.addEventListener('pointerup', end);
+      btn.addEventListener('pointerleave', end);
+      btn.addEventListener('pointercancel', end);
+    };
+
+    bindTouch(btnLeft, 'left');
+    bindTouch(btnRight, 'right');
+    if (btnJump) {
+      btnJump.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        if (this.isGrounded) this.jump();
+      });
+    }
+
+    // Clic en la parte inferior del escenario para caminar hacia allí
+    const bindStageClick = (stageEl) => {
+      stageEl?.addEventListener('click', (e) => {
+        if (e.target.closest('button, .photo-card, .bea-speech-bubble, dialog, .france-dedication-card')) return;
+        const rect = stageEl.getBoundingClientRect();
+        const clickY = e.clientY - rect.top;
+        if (clickY > rect.height * 0.40) {
+          const clickPercent = ((e.clientX - rect.left) / rect.width) * 100;
+          this.targetPosX = Math.max(6, Math.min(94, clickPercent));
+        }
+      });
+    };
+
+    bindStageClick(document.getElementById('sakura-stage'));
+    bindStageClick(document.getElementById('france-stage'));
+
+    // Clic en el bocadillo de interacción
+    this.speechBubble?.addEventListener('click', () => {
+      if (currentLevel === 'tree' && this.nearbyCouple) {
+        openCoupleModal(this.nearbyCouple);
+      } else if (currentLevel === 'france' && this.posX >= 86) {
+        switchLevel('tree');
+      } else if (currentLevel === 'tree' && this.posX <= 8) {
+        switchLevel('france');
+      }
+    });
+  }
+
+  jump() {
+    this.isGrounded = false;
+    this.velY = -12.5;
+    audioSynth.playJumpSound();
+    this.createDust();
+  }
+
+  createDust() {
+    const dust = document.createElement('div');
+    dust.className = 'footstep-dust';
+    dust.style.left = `${this.posX}%`;
+    dust.style.bottom = `${70 + this.offsetY}px`;
+    const currentContainer = currentLevel === 'france' 
+      ? document.getElementById('france-stage') 
+      : document.getElementById('sakura-stage');
+    currentContainer?.appendChild(dust);
+    setTimeout(() => dust.remove(), 500);
+  }
+
+  checkProximity() {
+    if (currentLevel === 'france') {
+      if (this.posX >= 86) {
+        if (this.speechBubble) {
+          this.speechBubble.style.display = 'flex';
+          this.bubbleText.textContent = `[E] Al Sakura 🌸 ➔`;
+        }
+      } else {
+        const nearbyRooster = ROOSTERS_DATA.find(r => Math.abs(this.posX - r.x) < 7.5);
+        if (nearbyRooster && this.speechBubble) {
+          this.speechBubble.style.display = 'flex';
+          this.bubbleText.textContent = `¡Bonjour! 🐓`;
+        } else if (this.speechBubble) {
+          this.speechBubble.style.display = 'none';
+        }
+      }
+      return;
+    }
+
+    // Nivel 2: Árbol Sakura
+    if (this.posX <= 8) {
+      if (this.speechBubble) {
+        this.speechBubble.style.display = 'flex';
+        this.bubbleText.textContent = `[E] Volver a París 🥐`;
+      }
+      return;
+    }
+
+    this.nearbyCouple = null;
+    let minDistance = 999;
+    let closestCouple = null;
+
+    for (const c of this.couples) {
+      const dist = Math.abs(this.posX - c.posX);
+      if (dist < 8.5 && dist < minDistance) {
+        minDistance = dist;
+        closestCouple = c;
+      }
+    }
+
+    if (closestCouple) {
+      this.nearbyCouple = closestCouple;
+      if (this.speechBubble) {
+        this.speechBubble.style.display = 'flex';
+        this.bubbleText.textContent = `[E] ${closestCouple.title || closestCouple.names}`;
+      }
+    } else {
+      if (this.speechBubble) {
+        this.speechBubble.style.display = 'none';
+      }
+    }
+  }
+
+  animate() {
+    let movingNow = false;
+
+    // Movimiento horizontal
+    if (this.keys.left) {
+      this.posX -= this.speed;
+      this.facing = 'left';
+      movingNow = true;
+    } else if (this.keys.right) {
+      this.posX += this.speed;
+      this.facing = 'right';
+      movingNow = true;
+    } else if (this.targetPosX !== null) {
+      const diff = this.targetPosX - this.posX;
+      if (Math.abs(diff) > 0.6) {
+        this.facing = diff > 0 ? 'right' : 'left';
+        this.posX += (diff > 0 ? 1 : -1) * this.speed;
+        movingNow = true;
+      } else {
+        this.targetPosX = null;
+      }
+    }
+
+    // Umbrales de transición automática entre niveles por sendero
+    if (currentLevel === 'france' && this.posX >= 91 && !isLevelTransitioning) {
+      switchLevel('tree');
+      return;
+    } else if (currentLevel === 'tree' && this.posX <= 4 && !isLevelTransitioning) {
+      switchLevel('france');
+      return;
+    }
+
+    // Límites del escenario
+    this.posX = Math.max(5, Math.min(94, this.posX));
+
+    // Salto y gravedad
+    if (!this.isGrounded) {
+      this.offsetY += this.velY;
+      this.velY += 0.65; // gravedad
+
+      if (this.offsetY >= 0) {
+        this.offsetY = 0;
+        this.velY = 0;
+        this.isGrounded = true;
+        this.createDust();
+      }
+    }
+
+    // Partículas de pisadas
+    if (movingNow && this.isGrounded) {
+      this.stepCounter++;
+      if (this.stepCounter % 14 === 0) {
+        this.createDust();
+      }
+    }
+
+    // Aplicar al elemento DOM
+    this.el.style.left = `${this.posX}%`;
+    this.el.style.transform = `translateX(-50%) translateY(${this.offsetY}px)`;
+
+    this.el.classList.toggle('walking', movingNow && this.isGrounded);
+    this.el.classList.toggle('idle', !movingNow && this.isGrounded);
+    this.el.classList.toggle('jumping', !this.isGrounded);
+    this.el.classList.toggle('facing-left', this.facing === 'left');
+
+    this.checkProximity();
+
+    requestAnimationFrame(() => this.animate());
+  }
+}
+
+/* ==========================================================================
+   SISTEMA DE NIVELES: FRANCIA (NIVEL 1) & ÁRBOL SAKURA (NIVEL 2)
+   ========================================================================== */
+let currentLevel = 'france';
+let isLevelTransitioning = false;
+
+function switchLevel(targetLevel) {
+  if (isLevelTransitioning || currentLevel === targetLevel) return;
+  isLevelTransitioning = true;
+
+  const layoutFrance = document.getElementById('layout-france');
+  const layoutTree = document.getElementById('layout-tree');
+  const charEl = document.getElementById('character-bea');
+
+  if (targetLevel === 'tree') {
+    audioSynth.playGameStartSound();
+    audioSynth.stopFrenchBgm();
+    const btnFranceMusic = document.getElementById('btn-france-music');
+    btnFranceMusic?.classList.remove('playing');
+
+    layoutFrance?.classList.remove('active');
+    layoutFrance?.classList.add('hidden');
+
+    layoutTree?.classList.remove('hidden');
+    layoutTree?.classList.add('active');
+
+    // Trasladar a Bea al escenario del árbol
+    const sakuraStage = document.getElementById('sakura-stage');
+    if (charEl && sakuraStage && !sakuraStage.contains(charEl)) {
+      sakuraStage.appendChild(charEl);
+    }
+    if (beaController) {
+      beaController.posX = 10;
+      beaController.targetPosX = null;
+      setTimeout(() => beaController.jump(), 280);
+    }
+
+    currentLevel = 'tree';
+  } else {
+    audioSynth.playChime();
+    audioSynth.stopBgm();
+    const btnMusicToggle = document.getElementById('btn-music-toggle');
+    btnMusicToggle?.classList.remove('playing');
+
+    layoutTree?.classList.remove('active');
+    layoutTree?.classList.add('hidden');
+
+    layoutFrance?.classList.remove('hidden');
+    layoutFrance?.classList.add('active');
+
+    // Trasladar a Bea al escenario de Francia
+    const franceStage = document.getElementById('france-stage');
+    if (charEl && franceStage && !franceStage.contains(charEl)) {
+      franceStage.appendChild(charEl);
+    }
+    if (beaController) {
+      beaController.posX = 84;
+      beaController.targetPosX = null;
+      setTimeout(() => beaController.jump(), 280);
+    }
+
+    currentLevel = 'france';
+  }
+
+  setTimeout(() => {
+    isLevelTransitioning = false;
+    if (beaController) {
+      beaController.animate();
+    }
+  }, 600);
+}
+
+/* ==========================================================================
+   ANIMACIÓN Y PATRULLA DE LOS 3 GALLOS GALOS
+   ========================================================================== */
+const ROOSTERS_DATA = [
+  { id: 'rooster-1', x: 15, minX: 6, maxX: 38, speed: 0.14, dir: 1, el: null },
+  { id: 'rooster-2', x: 48, minX: 28, maxX: 64, speed: 0.10, dir: -1, el: null },
+  { id: 'rooster-3', x: 75, minX: 52, maxX: 86, speed: 0.16, dir: 1, el: null }
+];
+
+function initRoosters() {
+  ROOSTERS_DATA.forEach(r => {
+    r.el = document.getElementById(r.id);
+  });
+
+  function updateRoosters() {
+    if (currentLevel === 'france') {
+      ROOSTERS_DATA.forEach(r => {
+        if (!r.el) return;
+        r.x += r.speed * r.dir;
+        if (r.x >= r.maxX) {
+          r.x = r.maxX;
+          r.dir = -1;
+        } else if (r.x <= r.minX) {
+          r.x = r.minX;
+          r.dir = 1;
+        }
+        r.el.style.left = `${r.x}%`;
+        r.el.classList.toggle('facing-left', r.dir === -1);
+      });
+    }
+    requestAnimationFrame(updateRoosters);
+  }
+
+  requestAnimationFrame(updateRoosters);
+}
+
+function initLevelSystem() {
+  const btnFranceSkip = document.getElementById('btn-france-skip');
+  const pathToSakura = document.getElementById('path-to-sakura');
+  const btnFranceMusic = document.getElementById('btn-france-music');
+  const btnToggleCrtFrance = document.getElementById('btn-toggle-crt-france');
+
+  btnFranceSkip?.addEventListener('click', () => switchLevel('tree'));
+  pathToSakura?.addEventListener('click', () => switchLevel('tree'));
+
+  btnFranceMusic?.addEventListener('click', () => {
+    const isPlaying = audioSynth.toggleFrenchBgm();
+    btnFranceMusic.classList.toggle('playing', isPlaying);
+  });
+
+  btnToggleCrtFrance?.addEventListener('click', () => {
+    document.body.classList.toggle('crt-active');
+    const active = document.body.classList.contains('crt-active');
+    btnToggleCrtFrance.classList.toggle('btn-primary', active);
+    const btnToggleCrtTree = document.getElementById('btn-toggle-crt');
+    btnToggleCrtTree?.classList.toggle('btn-primary', active);
+  });
+
+  const btnShowStart = document.getElementById('btn-show-start');
+  const pathToFrance = document.getElementById('path-to-france');
+  btnShowStart?.addEventListener('click', () => switchLevel('france'));
+  pathToFrance?.addEventListener('click', () => switchLevel('france'));
+}
+
+/* ==========================================================================
    INICIALIZACIÓN
    ========================================================================== */
+let beaController = null;
+
 window.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('sakura-canvas');
   if (canvas) {
@@ -455,4 +900,12 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   renderFramesLayer(couplesData);
+  processBeaSprite();
+  initLevelSystem();
+  initRoosters();
+
+  const charEl = document.getElementById('character-bea');
+  if (charEl) {
+    beaController = new BeaCharacterController(charEl, couplesData);
+  }
 });

@@ -86,13 +86,24 @@ export class PixelAudioSynth {
       659.25  // E5
     ];
     
-    // Melodía romántica pacífica
+    // Melodía romántica pacífica Sakura
     this.melody = [
       0, 2, 4, 2, 3, 2, 0, 1,
       2, 4, 5, 4, 3, 2, 1, 0,
       4, 5, 7, 5, 4, 3, 2, 4,
       3, 2, 1, 0, 2, 1, 0, 2
     ];
+
+    // Melodía vals parisino en 3/4 estilo acordeón 8-bit para Francia
+    this.frenchFrequencies = [
+      261.63, 329.63, 392.00, 329.63, 261.63, 329.63, // C4, E4, G4, E4, C4, E4
+      293.66, 349.23, 440.00, 349.23, 293.66, 349.23, // D4, F4, A4, F4, D4, F4
+      246.94, 293.66, 392.00, 293.66, 246.94, 293.66, // B3, D4, G4, D4, B3, D4
+      261.63, 329.63, 392.00, 523.25, 392.00, 329.63  // C4, E4, G4, C5, G4, E4
+    ];
+    this.isPlayingFrenchBgm = false;
+    this.frenchStep = 0;
+    this.frenchTimer = null;
   }
 
   init() {
@@ -156,6 +167,56 @@ export class PixelAudioSynth {
   }
 
   /**
+   * Sonido retro de salto estilo 8-bit
+   */
+  playJumpSound() {
+    this.init();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(420, this.ctx.currentTime + 0.14);
+
+    gain.gain.setValueAtTime(0.045, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.15);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.15);
+  }
+
+  /**
+   * Fanfarria de inicio de partida
+   */
+  playGameStartSound() {
+    this.init();
+    if (!this.ctx) return;
+
+    const notes = [329.63, 392.00, 523.25, 659.25]; // E4, G4, C5, E5
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
+
+      gain.gain.setValueAtTime(0.09, this.ctx.currentTime + idx * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + idx * 0.08 + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(this.ctx.currentTime + idx * 0.08);
+      osc.stop(this.ctx.currentTime + idx * 0.08 + 0.35);
+    });
+  }
+
+  /**
    * Alternar música de fondo tranquila en chiptune
    */
   toggleBgm() {
@@ -207,6 +268,61 @@ export class PixelAudioSynth {
     if (this.bgmTimer) {
       clearTimeout(this.bgmTimer);
       this.bgmTimer = null;
+    }
+  }
+
+  /**
+   * Alternar música retro francesa (vals parisino 8-bit)
+   */
+  toggleFrenchBgm() {
+    this.init();
+    if (this.isPlayingFrenchBgm) {
+      this.stopFrenchBgm();
+      return false;
+    } else {
+      this.stopBgm();
+      this.startFrenchBgm();
+      return true;
+    }
+  }
+
+  startFrenchBgm() {
+    this.init();
+    if (!this.ctx) return;
+    this.isPlayingFrenchBgm = true;
+    this.frenchStep = 0;
+
+    const playFrenchNote = () => {
+      if (!this.isPlayingFrenchBgm) return;
+
+      const freq = this.frenchFrequencies[this.frenchStep % this.frenchFrequencies.length];
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle'; // Calidez tipo acordeón parisino
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.045, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.35);
+
+      this.frenchStep++;
+      this.frenchTimer = setTimeout(playFrenchNote, 240);
+    };
+
+    playFrenchNote();
+  }
+
+  stopFrenchBgm() {
+    this.isPlayingFrenchBgm = false;
+    if (this.frenchTimer) {
+      clearTimeout(this.frenchTimer);
+      this.frenchTimer = null;
     }
   }
 }

@@ -26,63 +26,196 @@
 
   <div id="app-viewport">
 
-    <!-- HUD Superior -->
-    <header class="pixel-hud-header">
-      <div class="hud-title-box">
-        <span class="hud-badge">桜 恋</span>
-        <div>
-          <h1 class="hud-title">ARBOL SAKURA</h1>
-          <span class="hud-subtitle">ÁRBOL DE RECUERDOS • 恋人の木</span>
+    <!-- =======================================================================
+         NIVEL 1: CALLE DE FRANCIA (PARÍS RETRO PIXEL ART)
+         ======================================================================= -->
+    <section id="layout-france" class="game-level active" aria-label="Nivel 1: Calle de Francia">
+      <!-- HUD Superior de Francia -->
+      <header class="pixel-hud-header france-hud">
+        <div class="hud-title-box">
+          <span class="hud-badge">🇫🇷 恋</span>
+          <div>
+            <h1 class="hud-title">CALLE DE PARÍS</h1>
+            <span class="hud-subtitle">NIVEL 1 • EL COMIENZO DEL VIAJE</span>
+          </div>
+        </div>
+
+        <nav class="hud-actions" aria-label="Acciones de Francia">
+          <button id="btn-france-music" class="pixel-btn music-toggle" title="Música retro francesa estilo vals 8-bit">
+            <span>🎵 VALS 8-BIT</span>
+            <div class="equalizer-bars" aria-hidden="true">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+          </button>
+          <button id="btn-france-skip" class="pixel-btn" title="Avanzar directo al Árbol Sakura">
+            🌸 AL SAKURA ➔
+          </button>
+          <button id="btn-toggle-crt-france" class="pixel-btn" title="Alternar filtro retro CRT">
+            📺 CRT
+          </button>
+        </nav>
+      </header>
+
+      <!-- Escenario de la Calle Francesa -->
+      <div class="france-stage" id="france-stage">
+        <!-- Silueta de París de fondo (Torre Eiffel y tejados retro) -->
+        <div class="france-skyline" aria-hidden="true">
+          <div class="eiffel-tower-pixel"></div>
+          <div class="paris-rooftops"></div>
+        </div>
+
+        <!-- Farolas retro parisinas -->
+        <div class="street-lantern lantern-left" aria-hidden="true">
+          <div class="lantern-glow"></div>
+        </div>
+        <div class="street-lantern lantern-center" aria-hidden="true">
+          <div class="lantern-glow"></div>
+        </div>
+
+        <!-- Tarjeta Flotante con la Dedicatoria a Bea -->
+        <div class="france-dedication-card" id="france-dedication" aria-label="Dedicatoria especial para Bea">
+          <div class="dedication-header">
+            <span class="dedication-stamp">💌 POUR BEA • MON AMOUR</span>
+            <span class="dedication-sparkles">✨ 🌸 ✨</span>
+          </div>
+          <p class="dedication-quote">
+            "Dedicado a Bea: Para que nunca olvides lo hermoso que es pasar cada segundo a tu lado."
+          </p>
+          <div class="dedication-controls-hint">
+            <span class="hint-badge">🎮 GUÍA:</span>
+            <span><kbd>◀</kbd> <kbd>▶</kbd> o <kbd>A</kbd> <kbd>D</kbd> Mover • <kbd>▲</kbd> o <kbd>ESPACIO</kbd> Saltar • Camina hacia el sendero este ➔</span>
+          </div>
+        </div>
+
+        <!-- Capa de los 3 Gallos Galos que deambulan de un lado a otro -->
+        <div class="roosters-layer" id="roosters-layer" aria-label="Tres gallos galos paseando por la calle">
+          <div class="rooster-character" id="rooster-1" data-id="1">
+            <span class="rooster-nametag">Pierre 🐓</span>
+            <div class="rooster-sprite-pixel"></div>
+          </div>
+          <div class="rooster-character" id="rooster-2" data-id="2">
+            <span class="rooster-nametag">Marcel 🐓</span>
+            <div class="rooster-sprite-pixel"></div>
+          </div>
+          <div class="rooster-character" id="rooster-3" data-id="3">
+            <span class="rooster-nametag">Jules 🐓</span>
+            <div class="rooster-sprite-pixel"></div>
+          </div>
+        </div>
+
+        <!-- Sendero al Extremo Este hacia el Nivel 2 (Árbol Sakura) -->
+        <div class="trail-portal trail-portal-east" id="path-to-sakura" title="Sendero hacia el Árbol Sakura">
+          <div class="portal-sign">
+            <span class="portal-arrow-anim">➔</span>
+            <span class="portal-title">SENDERO SAKURA</span>
+            <span class="portal-dest">JAPÓN 🌸</span>
+          </div>
+          <div class="portal-torii-mini"></div>
+        </div>
+
+        <!-- Suelo de adoquines franceses -->
+        <div class="france-ground" aria-hidden="true">
+          <div class="cobblestone-pattern"></div>
+        </div>
+
+        <!-- Personaje Femenino 2D: Bea (en el nivel 1 inicialmente) -->
+        <div id="character-bea" class="character-bea idle" aria-label="Personaje de Bea caminando">
+          <div class="bea-speech-bubble" id="bea-speech-bubble">
+            <span class="bubble-icon">🌸</span>
+            <span id="bubble-text">¡Hola!</span>
+          </div>
+          <div class="bea-name-tag">Bea 🌸</div>
+          <div class="bea-sprite-container">
+            <img src="assets/bea_character.jpg" alt="Personaje pixel art de Bea" class="bea-sprite-img" id="bea-sprite-img">
+          </div>
+          <div class="bea-shadow"></div>
         </div>
       </div>
+    </section>
 
-      <nav class="hud-actions" aria-label="Acciones principales">
-        <button id="btn-add-couple" class="pixel-btn btn-primary" title="Colgar una foto de pareja en el árbol">
-          <span>+</span> COLGAR FOTO
-        </button>
-        <button id="btn-toggle-crt" class="pixel-btn" title="Alternar filtro retro CRT Scanlines">
-          📺 CRT
-        </button>
-      </nav>
-    </header>
-
-    <!-- Escenario del Árbol Sakura -->
-    <main class="sakura-stage theme-day" id="sakura-stage">
-      <!-- Imagen de fondo pixel art del árbol sakura -->
-      <img src="assets/sakura_tree_bg.jpg" alt="Majestuoso árbol sakura japonés en pixel art" class="sakura-bg-image"
-        id="sakura-bg">
-
-      <!-- Capa de Canvas para lluvia de pétalos interactiva -->
-      <canvas id="sakura-canvas"></canvas>
-
-      <!-- Capa de Marcos de Fotos Colgantes en las Ramas -->
-      <section class="frames-container" id="frames-layer" aria-label="Galería de marcos de parejas"></section>
-    </main>
-
-    <!-- HUD Inferior / Controles -->
-    <footer class="pixel-hud-footer">
-      <div class="hud-control-group" aria-label="Selector de momento del día">
-        <span class="hud-label">TIEMPO:</span>
-        <button class="theme-selector-btn active" data-theme="day" id="btn-theme-day">☀️ DÍA</button>
-        <button class="theme-selector-btn" data-theme="sunset" id="btn-theme-sunset">🌇 TARDE</button>
-        <button class="theme-selector-btn" data-theme="night" id="btn-theme-night">🌙 NOCHE</button>
-      </div>
-
-      <div class="hud-control-group" aria-label="Controles de ambiente y música">
-        <button id="btn-wind-toggle" class="pixel-btn" title="Aumentar o calmar el viento">
-          🍃 VIENTO: NORMAL
-        </button>
-
-        <button id="btn-music-toggle" class="pixel-btn music-toggle" title="Música retro de fondo 8-bit">
-          <span>🎵 8-BIT BGM</span>
-          <div class="equalizer-bars" aria-hidden="true">
-            <span class="eq-bar"></span>
-            <span class="eq-bar"></span>
-            <span class="eq-bar"></span>
+    <!-- =======================================================================
+         NIVEL 2: SANTUARIO DEL ÁRBOL SAKURA (JAPÓN)
+         ======================================================================= -->
+    <section id="layout-tree" class="game-level hidden" aria-label="Nivel 2: Árbol Sakura de Recuerdos">
+      <!-- HUD Superior del Árbol Sakura -->
+      <header class="pixel-hud-header">
+        <div class="hud-title-box">
+          <span class="hud-badge">桜 恋</span>
+          <div>
+            <h1 class="hud-title">ARBOL SAKURA</h1>
+            <span class="hud-subtitle">NIVEL 2 • ÁRBOL DE RECUERDOS • 恋人の木</span>
           </div>
-        </button>
-      </div>
-    </footer>
+        </div>
+
+        <nav class="hud-actions" aria-label="Acciones principales">
+          <button id="btn-show-start" class="pixel-btn" title="Regresar al Nivel 1 en Francia">
+            ⬅ 🇫🇷 FRANCIA
+          </button>
+          <button id="btn-add-couple" class="pixel-btn btn-primary" title="Colgar una foto de pareja en el árbol">
+            <span>+</span> COLGAR FOTO
+          </button>
+          <button id="btn-toggle-crt" class="pixel-btn" title="Alternar filtro retro CRT Scanlines">
+            📺 CRT
+          </button>
+        </nav>
+      </header>
+
+      <!-- Escenario del Árbol Sakura -->
+      <main class="sakura-stage theme-day" id="sakura-stage">
+        <!-- Imagen de fondo pixel art del árbol sakura -->
+        <img src="assets/sakura_tree_bg.jpg" alt="Majestuoso árbol sakura japonés en pixel art" class="sakura-bg-image"
+          id="sakura-bg">
+
+        <!-- Capa de Canvas para lluvia de pétalos interactiva -->
+        <canvas id="sakura-canvas"></canvas>
+
+        <!-- Sendero de Retorno hacia Francia (Extremo Izquierdo) -->
+        <div class="trail-portal trail-portal-west" id="path-to-france" title="Regresar a la calle de Francia">
+          <div class="portal-sign">
+            <span class="portal-arrow-anim">⬅</span>
+            <span class="portal-title">A PARÍS</span>
+            <span class="portal-dest">FRANCIA 🥐</span>
+          </div>
+        </div>
+
+        <!-- Capa de Marcos de Fotos Colgantes en las Ramas -->
+        <section class="frames-container" id="frames-layer" aria-label="Galería de marcos de parejas"></section>
+      </main>
+
+      <!-- HUD Inferior / Controles de Ambiente Sakura -->
+      <footer class="pixel-hud-footer">
+        <div class="hud-control-group" aria-label="Selector de momento del día">
+          <span class="hud-label">TIEMPO:</span>
+          <button class="theme-selector-btn active" data-theme="day" id="btn-theme-day">☀️ DÍA</button>
+          <button class="theme-selector-btn" data-theme="sunset" id="btn-theme-sunset">🌇 TARDE</button>
+          <button class="theme-selector-btn" data-theme="night" id="btn-theme-night">🌙 NOCHE</button>
+        </div>
+
+        <div class="hud-control-group" aria-label="Controles de ambiente y música">
+          <button id="btn-wind-toggle" class="pixel-btn" title="Aumentar o calmar el viento">
+            🍃 VIENTO: NORMAL
+          </button>
+
+          <button id="btn-music-toggle" class="pixel-btn music-toggle" title="Música retro de fondo 8-bit">
+            <span>🎵 SAKURA BGM</span>
+            <div class="equalizer-bars" aria-hidden="true">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+          </button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- Controles Táctiles en Pantalla para móvil (compartidos para ambos niveles) -->
+    <div class="character-touch-controls" id="touch-controls" aria-label="Controles táctiles de movimiento">
+      <button class="touch-btn" id="btn-touch-left" aria-label="Mover a la izquierda">◀</button>
+      <button class="touch-btn touch-btn-jump" id="btn-touch-jump" aria-label="Saltar">▲ SALTO</button>
+      <button class="touch-btn" id="btn-touch-right" aria-label="Mover a la derecha">▶</button>
+    </div>
 
   </div>
 
