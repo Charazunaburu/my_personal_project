@@ -631,10 +631,10 @@ class BeaCharacterController {
           this.bubbleText.textContent = `[E] Al Sakura 🌸 ➔`;
         }
       } else {
-        const nearbyRooster = ROOSTERS_DATA.find(r => Math.abs(this.posX - r.x) < 7.5);
+        const nearbyRooster = ROOSTERS_DATA.find(r => Math.abs(this.posX - r.x) < 7);
         if (nearbyRooster && this.speechBubble) {
           this.speechBubble.style.display = 'flex';
-          this.bubbleText.textContent = `¡Bonjour! 🐓`;
+          this.bubbleText.textContent = nearbyRooster.greeting;
         } else if (this.speechBubble) {
           this.speechBubble.style.display = 'none';
         }
@@ -858,17 +858,24 @@ function switchLevel(targetLevel) {
 }
 
 /* ==========================================================================
-   ANIMACIÓN Y PATRULLA DE LOS 3 GALLOS GALOS
+   ANIMACIÓN Y PATRULLA DE LOS 3 GALLOS GALOS (PIERRE, MARCEL, JULES)
    ========================================================================== */
 const ROOSTERS_DATA = [
-  { id: 'rooster-1', x: 15, minX: 6, maxX: 38, speed: 0.14, dir: 1, el: null },
-  { id: 'rooster-2', x: 48, minX: 28, maxX: 64, speed: 0.10, dir: -1, el: null },
-  { id: 'rooster-3', x: 75, minX: 52, maxX: 86, speed: 0.16, dir: 1, el: null }
+  { id: 'rooster-1', name: 'Pierre', x: 12, minX: 5, maxX: 40, speed: 0.12, dir: 1, greeting: '¡Cocorico! Pierre 🐓', el: null },
+  { id: 'rooster-2', name: 'Marcel', x: 45, minX: 28, maxX: 68, speed: 0.08, dir: -1, greeting: '¡Bonjour! Marcel 🥖', el: null },
+  { id: 'rooster-3', name: 'Jules',  x: 70, minX: 58, maxX: 88, speed: 0.15, dir: 1, greeting: '¡Salut! Jules 🥐', el: null }
 ];
 
 function initRoosters() {
   ROOSTERS_DATA.forEach(r => {
     r.el = document.getElementById(r.id);
+    r.el?.addEventListener('click', () => {
+      r.el.style.transform = 'translateY(-10px)';
+      audioSynth.playChimeSound();
+      setTimeout(() => {
+        if (r.el) r.el.style.transform = '';
+      }, 240);
+    });
   });
 
   function updateRoosters() {
