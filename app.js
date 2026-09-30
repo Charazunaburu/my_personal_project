@@ -164,6 +164,12 @@ class SakuraPetalEngine {
   animate() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    // Inactivo completamente si el jugador se encuentra en el Nivel 1 (Francia)
+    if (typeof currentLevel !== 'undefined' && currentLevel !== 'tree') {
+      this.animationId = requestAnimationFrame(() => this.animate());
+      return;
+    }
+
     for (let i = 0; i < this.petals.length; i++) {
       const p = this.petals[i];
 
@@ -805,6 +811,11 @@ function switchLevel(targetLevel) {
     const btnFranceMusic = document.getElementById('btn-france-music');
     btnFranceMusic?.classList.remove('playing');
 
+    // Iniciar BGM de Sakura en el Nivel 2
+    audioSynth.startSakuraBgm();
+    const btnMusicToggle = document.getElementById('btn-music-toggle');
+    btnMusicToggle?.classList.add('playing');
+
     layoutFrance?.classList.remove('active');
     layoutFrance?.classList.add('hidden');
 
@@ -825,9 +836,14 @@ function switchLevel(targetLevel) {
     currentLevel = 'tree';
   } else {
     audioSynth.playChime();
-    audioSynth.stopBgm();
+    audioSynth.stopSakuraBgm();
     const btnMusicToggle = document.getElementById('btn-music-toggle');
     btnMusicToggle?.classList.remove('playing');
+
+    // Reanudar Vals Francés en el Nivel 1
+    audioSynth.startFrenchBgm();
+    const btnFranceMusic = document.getElementById('btn-france-music');
+    btnFranceMusic?.classList.add('playing');
 
     layoutTree?.classList.remove('active');
     layoutTree?.classList.add('hidden');
@@ -926,6 +942,21 @@ function initLevelSystem() {
   const pathToFrance = document.getElementById('path-to-france');
   btnShowStart?.addEventListener('click', () => switchLevel('france'));
   pathToFrance?.addEventListener('click', () => switchLevel('france'));
+
+  // Inicio de audio tras la primera interacción del usuario (requisito de políticas de navegador)
+  const handleFirstInteraction = () => {
+    window.removeEventListener('keydown', handleFirstInteraction);
+    window.removeEventListener('click', handleFirstInteraction);
+    window.removeEventListener('touchstart', handleFirstInteraction);
+    audioSynth.init();
+    if (currentLevel === 'france' && !audioSynth.isPlayingFrenchBgm) {
+      audioSynth.startFrenchBgm();
+      btnFranceMusic?.classList.add('playing');
+    }
+  };
+  window.addEventListener('keydown', handleFirstInteraction, { once: true });
+  window.addEventListener('click', handleFirstInteraction, { once: true });
+  window.addEventListener('touchstart', handleFirstInteraction, { once: true });
 }
 
 /* ==========================================================================
