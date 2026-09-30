@@ -456,30 +456,66 @@ function processBeaSprite() {
   img.src = 'assets/bea_character.jpg';
   img.onload = () => {
     try {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth || 512;
-      canvas.height = img.naturalHeight || 512;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
+      const srcCanvas = document.createElement('canvas');
+      const w = img.naturalWidth || 1024;
+      const h = img.naturalHeight || 1024;
+      srcCanvas.width = w;
+      srcCanvas.height = h;
+      const srcCtx = srcCanvas.getContext('2d');
+      srcCtx.drawImage(img, 0, 0);
 
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const imgData = srcCtx.getImageData(0, 0, w, h);
       const data = imgData.data;
 
-      // Quitar fondo blanco/claro para dejar transparencia perfecta
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        if (r > 230 && g > 230 && b > 230) {
-          data[i + 3] = 0;
+      let minX = w, maxX = 0, minY = h, maxY = 0;
+
+      // Quitar fondo blanco/claro y encontrar el bounding box exacto de Bea
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = (y * w + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          // Considerar transparente si es fondo claro
+          if (r > 225 && g > 225 && b > 225) {
+            data[idx + 3] = 0;
+          } else if (data[idx + 3] > 10) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
         }
       }
-      ctx.putImageData(imgData, 0, 0);
-      const transparentUrl = canvas.toDataURL('image/png');
 
-      document.querySelectorAll('.bea-sprite-img, .start-bea-preview').forEach(el => {
-        el.src = transparentUrl;
-      });
+      srcCtx.putImageData(imgData, 0, 0);
+
+      // Si se detectó el personaje, recortar ajustado exactamente a sus pies y cabeza
+      if (maxX > minX && maxY > minY) {
+        const cropW = maxX - minX + 1;
+        const cropH = maxY - minY + 1;
+
+        const cropCanvas = document.createElement('canvas');
+        cropCanvas.width = cropW;
+        cropCanvas.height = cropH;
+        const cropCtx = cropCanvas.getContext('2d');
+
+        cropCtx.drawImage(
+          srcCanvas,
+          minX, minY, cropW, cropH,
+          0, 0, cropW, cropH
+        );
+
+        const croppedTransparentUrl = cropCanvas.toDataURL('image/png');
+        document.querySelectorAll('.bea-sprite-img, .start-bea-preview').forEach(el => {
+          el.src = croppedTransparentUrl;
+        });
+      } else {
+        const transparentUrl = srcCanvas.toDataURL('image/png');
+        document.querySelectorAll('.bea-sprite-img, .start-bea-preview').forEach(el => {
+          el.src = transparentUrl;
+        });
+      }
     } catch (err) {
       console.warn('Aviso: el sprite usará imagen original:', err);
     }
