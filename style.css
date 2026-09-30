@@ -929,7 +929,7 @@ kbd {
    NIVEL 1: CALLE DE FRANCIA (PARÍS RETRO PIXEL ART)
    ========================================================================== */
 #layout-france {
-  background: linear-gradient(180deg, #0d1527 0%, #1a2639 30%, #293b52 55%, #1f2c3d 85%, #182230 100%);
+  background: linear-gradient(180deg, #090e1a 0%, #111a2e 30%, #1c2a42 60%, #28374d 85%, #182230 100%);
 }
 
 .france-hud {
@@ -945,107 +945,26 @@ kbd {
   overflow: hidden;
 }
 
-/* Silueta de París de fondo: Torre Eiffel y tejados retro */
-.france-skyline {
+/* Imagen de fondo pixel art de alta fidelidad: Calle de París al atardecer */
+.france-bg-image {
   position: absolute;
-  top: 15%;
+  top: 0;
   left: 0;
-  right: 0;
-  bottom: 120px;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  image-rendering: pixelated;
   z-index: 1;
 }
 
-.eiffel-tower-pixel {
-  position: absolute;
-  left: 12%;
-  bottom: 0;
-  width: 130px;
-  height: 240px;
-  background-repeat: no-repeat;
-  background-position: bottom center;
-  background-size: contain;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.25));
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cpath d='M47 5h6v12h-6zm-3 12h12v14H44zm-5 14h22v26H39zm-6 26h34v38H33zm-8 38h50v55H25zm-15 55h80v50H10zm34-45h12v45H44z' fill='%231e293b' stroke='%23fbbf24' stroke-width='1.5' stroke-dasharray='3 3'/%3E%3Ccircle cx='50' cy='5' r='3' fill='%23f59e0b'/%3E%3Cpath d='M35 120l30 0M28 150l44 0' stroke='%23f59e0b' stroke-width='2'/%3E%3C/svg%3E");
-}
-
-.paris-rooftops {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 90px;
-  opacity: 0.65;
-  background-repeat: repeat-x;
-  background-position: bottom;
-  background-size: 160px 80px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 80'%3E%3Cpolygon points='0,80 0,40 25,20 50,40 50,80' fill='%231e293b'/%3E%3Crect x='15' y='10' width='8' height='16' fill='%230f172a'/%3E%3Cpolygon points='50,80 50,30 90,15 130,30 130,80' fill='%23152033'/%3E%3Crect x='85' y='5' width='10' height='20' fill='%230f172a'/%3E%3Cpolygon points='130,80 130,45 160,30 160,80' fill='%231e293b'/%3E%3C/svg%3E");
-}
-
-/* Farolas retro parisinas */
-.street-lantern {
-  position: absolute;
-  bottom: 80px;
-  width: 24px;
-  height: 120px;
-  z-index: 5;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 120'%3E%3Crect x='10' y='25' width='4' height='95' fill='%23111827'/%3E%3Cpolygon points='6,15 18,15 15,25 9,25' fill='%23fbbf24'/%3E%3Cpolygon points='5,15 19,15 12,5' fill='%23111827'/%3E%3Ccircle cx='12' cy='20' r='3' fill='%23fff'/%3E%3Crect x='7' y='115' width='10' height='5' fill='%23111827'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.street-lantern.lantern-left {
-  left: 28%;
-}
-
-.street-lantern.lantern-center {
-  left: 68%;
-}
-
-.lantern-glow {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70px;
-  height: 70px;
-  background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.1) 45%, transparent 70%);
-  border-radius: 50%;
-  animation: lanternFlicker 3s infinite alternate ease-in-out;
-}
-
-@keyframes lanternFlicker {
-  0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
-  50% { opacity: 1; transform: translateX(-50%) scale(1.08); }
-  75% { opacity: 0.75; transform: translateX(-50%) scale(0.95); }
-}
-
-/* Suelo de adoquines */
-.france-ground {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 85px;
-  background: #1c222c;
-  border-top: 4px solid #3b4252;
-  box-shadow: inset 0 6px 0 #11151c;
-  z-index: 3;
-}
-
-.cobblestone-pattern {
+/* Ambientación y viñeta atmosférica parisina */
+.france-ambient-overlay {
   position: absolute;
   inset: 0;
-  opacity: 0.4;
-  background-image: 
-    linear-gradient(335deg, #2e3440 23px, transparent 23px),
-    linear-gradient(155deg, #3b4252 23px, transparent 23px),
-    linear-gradient(335deg, #2e3440 23px, transparent 23px),
-    linear-gradient(155deg, #3b4252 23px, transparent 23px);
-  background-size: 58px 58px;
-  background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
+  background: radial-gradient(circle at 50% 35%, transparent 45%, rgba(13, 21, 39, 0.3) 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Tarjeta de Dedicatoria */
@@ -1054,28 +973,30 @@ kbd {
   top: 76px; /* Despejado completamente debajo del HUD */
   left: 50%;
   transform: translateX(-50%);
-  max-width: 650px;
-  width: 90%;
-  background: rgba(15, 23, 42, 0.96);
+  max-width: 680px;
+  width: 92%;
+  background: rgba(15, 23, 42, 0.95);
   border: 3px solid #f472b6;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 4px 4px 0 #000;
-  padding: 14px 20px;
+  outline: 2px solid #fbbf24;
+  outline-offset: -5px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(244, 114, 182, 0.35), 4px 4px 0 #000;
+  padding: 16px 22px;
   z-index: 15;
   text-align: center;
-  backdrop-filter: blur(6px);
-  animation: dedicationFloat 4s ease-in-out infinite alternate;
+  backdrop-filter: blur(8px);
+  animation: dedicationFloat 4.5s ease-in-out infinite alternate;
 }
 
 @keyframes dedicationFloat {
   0% { transform: translateX(-50%) translateY(0); }
-  100% { transform: translateX(-50%) translateY(-4px); }
+  100% { transform: translateX(-50%) translateY(-5px); }
 }
 
 .dedication-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 8px;
 }
 
@@ -1088,17 +1009,17 @@ kbd {
 }
 
 .dedication-sparkles {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .dedication-quote {
   font-family: var(--font-pixel);
-  font-size: 9.5px;
-  line-height: 1.8;
+  font-size: 10px;
+  line-height: 1.85;
   color: #ffffff;
-  margin: 8px 0 12px 0;
-  text-shadow: 2px 2px 0 #000;
-  letter-spacing: 0.5px;
+  margin: 10px 0 14px 0;
+  text-shadow: 2px 2px 0 #000, 0 0 10px rgba(251, 191, 36, 0.25);
+  letter-spacing: 0.6px;
 }
 
 .dedication-controls-hint {
@@ -1110,9 +1031,9 @@ kbd {
   justify-content: center;
   gap: 6px;
   flex-wrap: wrap;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 6px 10px;
-  border: 1px solid rgba(244, 114, 182, 0.3);
+  background: rgba(0, 0, 0, 0.65);
+  padding: 6px 12px;
+  border: 1px solid rgba(244, 114, 182, 0.35);
 }
 
 .dedication-controls-hint kbd {
@@ -1133,7 +1054,7 @@ kbd {
 /* Sendero hacia Sakura (Portal Este) y Retorno (Portal Oeste) */
 .trail-portal {
   position: absolute;
-  bottom: 85px;
+  bottom: 46px;
   z-index: 8;
   display: flex;
   align-items: center;
@@ -1148,29 +1069,45 @@ kbd {
 
 .trail-portal-west {
   left: 18px;
+  bottom: 65px;
 }
 
 .trail-portal:hover {
   transform: scale(1.06);
 }
 
+.portal-post {
+  position: absolute;
+  bottom: -46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 52px;
+  background: linear-gradient(to right, #374151, #6b7280, #374151);
+  border: 1px solid #111827;
+  z-index: 1;
+}
+
 .portal-sign {
-  background: #e11d48;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 60%, #9f1239 100%);
   border: 2px solid #fff;
-  box-shadow: 2px 2px 0 #000, 0 0 12px rgba(225, 29, 72, 0.6);
-  padding: 6px 10px;
+  outline: 2px solid #fbbf24;
+  box-shadow: 2px 2px 0 #000, 0 0 16px rgba(225, 29, 72, 0.7);
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   font-family: var(--font-pixel);
   color: #fff;
-  animation: portalPulse 1.8s infinite ease-in-out;
+  animation: portalPulse 2s infinite ease-in-out;
 }
 
 @keyframes portalPulse {
-  0%, 100% { box-shadow: 2px 2px 0 #000, 0 0 8px rgba(225, 29, 72, 0.4); }
-  50% { box-shadow: 2px 2px 0 #000, 0 0 16px rgba(244, 114, 182, 0.9); }
+  0%, 100% { box-shadow: 2px 2px 0 #000, 0 0 10px rgba(225, 29, 72, 0.5); }
+  50% { box-shadow: 2px 2px 0 #000, 0 0 20px rgba(244, 114, 182, 0.95); }
 }
 
 .portal-arrow-anim {
@@ -1179,8 +1116,8 @@ kbd {
 }
 
 @keyframes arrowBounce {
-  0% { transform: translateX(-2px); }
-  100% { transform: translateX(3px); }
+  0% { transform: translateX(-3px); }
+  100% { transform: translateX(4px); }
 }
 
 .portal-title {
@@ -1193,12 +1130,40 @@ kbd {
   color: #fecdd3;
 }
 
+.portal-torii-mini {
+  position: absolute;
+  right: -16px;
+  bottom: 0;
+  width: 32px;
+  height: 42px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 40'%3E%3Crect x='0' y='6' width='32' height='4' fill='%23111827'/%3E%3Cpath d='M-2 4 Q16 0 34 4' stroke='%23e11d48' stroke-width='4' fill='none'/%3E%3Crect x='4' y='12' width='24' height='3' fill='%23e11d48'/%3E%3Crect x='6' y='6' width='4' height='34' fill='%23e11d48'/%3E%3Crect x='22' y='6' width='4' height='34' fill='%23e11d48'/%3E%3Crect x='5' y='36' width='6' height='4' fill='%23111827'/%3E%3Crect x='21' y='36' width='6' height='4' fill='%23111827'/%3E%3C/svg%3E");
+  opacity: 0.92;
+  filter: drop-shadow(0 0 6px rgba(244, 114, 182, 0.6));
+}
+
+@media (max-width: 640px) {
+  .france-dedication-card {
+    top: 68px;
+    padding: 10px 14px;
+    max-width: 95%;
+  }
+  .dedication-quote {
+    font-size: 8px;
+    line-height: 1.6;
+  }
+  .dedication-controls-hint {
+    font-size: 6.5px;
+  }
+}
+
 /* ==========================================================================
    LOS 3 GALLOS GALOS (PIXEL ART ROOSTERS)
    ========================================================================== */
 .roosters-layer {
   position: absolute;
-  bottom: 68px;
+  bottom: 38px;
   left: 0;
   right: 0;
   height: 55px;
@@ -1265,7 +1230,7 @@ kbd {
 }
 
 #france-stage .character-bea {
-  bottom: 84px;
+  bottom: 44px;
 }
 
 #sakura-stage .character-bea {

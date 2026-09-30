@@ -60,19 +60,11 @@
 
       <!-- Escenario de la Calle Francesa -->
       <div class="france-stage" id="france-stage">
-        <!-- Silueta de París de fondo (Torre Eiffel y tejados retro) -->
-        <div class="france-skyline" aria-hidden="true">
-          <div class="eiffel-tower-pixel"></div>
-          <div class="paris-rooftops"></div>
-        </div>
+        <!-- Imagen de fondo pixel art de la calle de París -->
+        <img src="assets/france_street_bg.jpg" alt="Calle de París al atardecer en pixel art con la Torre Eiffel" class="france-bg-image" id="france-bg">
 
-        <!-- Farolas retro parisinas -->
-        <div class="street-lantern lantern-left" aria-hidden="true">
-          <div class="lantern-glow"></div>
-        </div>
-        <div class="street-lantern lantern-center" aria-hidden="true">
-          <div class="lantern-glow"></div>
-        </div>
+        <!-- Bruma y ambientación retro parisina -->
+        <div class="france-ambient-overlay" aria-hidden="true"></div>
 
         <!-- Tarjeta Flotante con la Dedicatoria a Bea -->
         <div class="france-dedication-card" id="france-dedication" aria-label="Dedicatoria especial para Bea">
@@ -107,18 +99,15 @@
 
         <!-- Sendero al Extremo Este hacia el Nivel 2 (Árbol Sakura) -->
         <div class="trail-portal trail-portal-east" id="path-to-sakura" title="Sendero hacia el Árbol Sakura">
+          <div class="portal-post"></div>
           <div class="portal-sign">
             <span class="portal-arrow-anim">➔</span>
-            <span class="portal-title">SENDERO SAKURA</span>
-            <span class="portal-dest">JAPÓN 🌸</span>
+            <span class="portal-title">🌸 Hacia el Sakura ➔</span>
+            <span class="portal-dest">SANTUARIO JAPONÉS • NIVEL 2</span>
           </div>
-          <div class="portal-torii-mini"></div>
+          <div class="portal-torii-mini" aria-hidden="true"></div>
         </div>
 
-        <!-- Suelo de adoquines franceses -->
-        <div class="france-ground" aria-hidden="true">
-          <div class="cobblestone-pattern"></div>
-        </div>
 
         <!-- Personaje Femenino 2D: Bea (en el nivel 1 inicialmente) -->
         <div id="character-bea" class="character-bea idle" aria-label="Personaje de Bea caminando">
