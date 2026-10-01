@@ -1359,7 +1359,7 @@ kbd {
 
 /* Ciclo de caminata: paso rítmico retro coordinado con la alternancia de piernas */
 .character-bea.walking .bea-sprite-img {
-  animation: beaWalkStep 0.44s steps(2) infinite;
+  animation: beaWalkStep 0.66s steps(2) infinite;
 }
 
 @keyframes beaWalkStep {
@@ -1373,7 +1373,7 @@ kbd {
 
 /* Pulso y compresión de la sombra al caminar */
 .character-bea.walking .bea-shadow {
-  animation: beaShadowPulse 0.48s infinite ease-in-out;
+  animation: beaShadowPulse 0.66s infinite ease-in-out;
 }
 
 @keyframes beaShadowPulse {
@@ -1389,7 +1389,7 @@ kbd {
 
 /* Balanceo de etiqueta de nombre al caminar */
 .character-bea.walking .bea-name-tag {
-  animation: beaTagSway 0.48s infinite ease-in-out;
+  animation: beaTagSway 0.66s infinite ease-in-out;
 }
 
 @keyframes beaTagSway {

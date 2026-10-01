@@ -1,6 +1,6 @@
 # SPEC 01 — Dos niveles jugables: Francia y el Árbol Sakura de Recuerdos
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** None
 > **Date:** 2026-09-30
 > **Objective:** Separar la aplicación en dos niveles jugables: un primer nivel en Francia donde Bea camina junto a tres gallos animados y sigue un sendero de conexión, y un segundo nivel en el Árbol Sakura con fotos de recuerdos y lluvia de pétalos.
@@ -101,17 +101,17 @@ Convenciones:
 
 ## Criterios de aceptación
 
-- [ ] El sprite de Bea es visiblemente más grande y nítido en pantalla (~95x145px, un ~60% más grande que el original).
-- [ ] Al mantener presionadas las teclas de movimiento horizontal (flechas o A/D), Bea ejecuta una animación de caminado rítmica con pasos visibles y balanceo natural.
-- [ ] Al soltar las teclas, Bea se detiene de inmediato y entra en estado de reposo (`idle`) sin deformaciones.
-- [ ] Al cargar la página, se inicia en el Nivel 1 (Francia) con una ambientación parisina de adoquines y la dedicatoria: *"Dedicado a Bea: Para que nunca olvides lo hermoso que es pasar cada segundo a tu lado."*.
-- [ ] El jugador puede controlar a Bea en el Nivel 1 (Francia) para desplazarse y saltar libremente.
-- [ ] 3 gallos pixel art deambulan de un lado a otro a lo largo de la calle francesa mientras Bea camina.
-- [ ] La lluvia de pétalos de sakura del canvas y la música del árbol están completamente inactivas en Francia; suena el vals parisino 8-bit.
-- [ ] En el extremo derecho de la calle en Francia se encuentra señalizado el sendero hacia el Árbol Sakura.
-- [ ] Al guiar a Bea hasta el final del sendero derecho (`x >= 92%`), se dispara una transición fluida al Nivel 2 (Árbol Sakura).
-- [ ] Al ingresar al Nivel 2, Bea aparece en el lado izquierdo del árbol, se activa la lluvia de pétalos de sakura, la música japonesa tradicional y los marcos de fotos son accesibles.
-- [ ] Guiar a Bea hacia el extremo izquierdo del árbol (`x <= 4%`) o pulsar "Volver a Francia" en el HUD la traslada de vuelta al Nivel 1 de forma fluida.
+- [x] El sprite de Bea es visiblemente más grande y nítido en pantalla (~95x145px, un ~60% más grande que el original).
+- [x] Al mantener presionadas las teclas de movimiento horizontal (flechas o A/D), Bea ejecuta una animación de caminado rítmica con pasos visibles y balanceo natural.
+- [x] Al soltar las teclas, Bea se detiene de inmediato y entra en estado de reposo (`idle`) sin deformaciones.
+- [x] Al cargar la página, se inicia en el Nivel 1 (Francia) con una ambientación parisina de adoquines y la dedicatoria: *"Dedicado a Bea: Para que nunca olvides lo hermoso que es pasar cada segundo a tu lado."*.
+- [x] El jugador puede controlar a Bea en el Nivel 1 (Francia) para desplazarse y saltar libremente.
+- [x] 3 gallos pixel art deambulan de un lado a otro a lo largo de la calle francesa mientras Bea camina.
+- [x] La lluvia de pétalos de sakura del canvas y la música del árbol están completamente inactivas en Francia; suena el vals parisino 8-bit.
+- [x] En el extremo derecho de la calle en Francia se encuentra señalizado el sendero hacia el Árbol Sakura.
+- [x] Al guiar a Bea hasta el final del sendero derecho (`x >= 92%`), se dispara una transición fluida al Nivel 2 (Árbol Sakura).
+- [x] Al ingresar al Nivel 2, Bea aparece en el lado izquierdo del árbol, se activa la lluvia de pétalos de sakura, la música japonesa tradicional y los marcos de fotos son accesibles.
+- [x] Guiar a Bea hacia el extremo izquierdo del árbol (`x <= 4%`) o pulsar "Volver a Francia" en el HUD la traslada de vuelta al Nivel 1 de forma fluida.
 
 ---
 

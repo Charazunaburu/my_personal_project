@@ -495,11 +495,13 @@ class BeaCharacterController {
     this.posX = 26; // % horizontal inicial
     this.offsetY = 0; // px vertical (salto)
     this.velY = 0;
-    this.speed = 0.52; // % por fotograma
+    this.speed = 0.22; // % por fotograma (caminata serena y constante)
     this.isGrounded = true;
     this.facing = 'right';
     this.isMoving = false;
     this.nearbyCouple = null;
+    this.lastTime = null;
+    this.animFrameId = null;
 
     // Referencia al sprite y gestión de fotogramas de caminata
     this.spriteImg = this.el?.querySelector('.bea-sprite-img') || document.getElementById('bea-sprite-img');
@@ -522,6 +524,13 @@ class BeaCharacterController {
   }
 
   initControls() {
+    window.addEventListener('blur', () => {
+      this.keys.left = false;
+      this.keys.right = false;
+      this.keys.jump = false;
+      this.targetPosX = null;
+    });
+
     window.addEventListener('keydown', (e) => {
       // Ignorar si un diálogo modal está abierto
       if (document.querySelector('dialog[open]')) return;
@@ -649,7 +658,7 @@ class BeaCharacterController {
     }
 
     // Nivel 2: Árbol Sakura
-    if (this.posX <= 8) {
+    if (this.posX <= 10) {
       if (this.speechBubble) {
         this.speechBubble.style.display = 'flex';
         this.bubbleText.textContent = `[E] Volver a París 🥐`;
@@ -683,44 +692,66 @@ class BeaCharacterController {
   }
 
   animate() {
-    let movingNow = false;
+    // Garantizar que solo exista un bucle de animación activo (evita aceleraciones y teletransporte)
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
 
-    // Movimiento horizontal
+    const now = performance.now();
+    if (!this.lastTime) this.lastTime = now;
+    // Delta time en segundos, acotado a 0.05s para evitar saltos si el usuario cambia de pestaña
+    const dt = Math.min((now - this.lastTime) / 1000, 0.05);
+    this.lastTime = now;
+    const timeScale = dt * 60; // 1.0 a 60 FPS estándar
+
+    let movingNow = false;
+    const moveStep = this.speed * timeScale;
+
+    // Movimiento horizontal a velocidad constante y pausada
     if (this.keys.left) {
-      this.posX -= this.speed;
+      this.posX -= moveStep;
       this.facing = 'left';
       movingNow = true;
     } else if (this.keys.right) {
-      this.posX += this.speed;
+      this.posX += moveStep;
       this.facing = 'right';
       movingNow = true;
     } else if (this.targetPosX !== null) {
       const diff = this.targetPosX - this.posX;
-      if (Math.abs(diff) > 0.6) {
+      if (Math.abs(diff) > 0.3) {
         this.facing = diff > 0 ? 'right' : 'left';
-        this.posX += (diff > 0 ? 1 : -1) * this.speed;
+        const step = Math.min(Math.abs(diff), moveStep);
+        this.posX += (diff > 0 ? 1 : -1) * step;
         movingNow = true;
       } else {
         this.targetPosX = null;
       }
     }
 
-    // Umbrales de transición automática entre niveles por sendero
-    if (currentLevel === 'france' && this.posX >= 91 && !isLevelTransitioning) {
-      switchLevel('tree');
-      return;
-    } else if (currentLevel === 'tree' && this.posX <= 4 && !isLevelTransitioning) {
-      switchLevel('france');
-      return;
+    // Bloquear controles durante la transición de nivel
+    if (isLevelTransitioning) {
+      this.keys.left = false;
+      this.keys.right = false;
+      this.targetPosX = null;
     }
 
-    // Límites del escenario
-    this.posX = Math.max(5, Math.min(94, this.posX));
+    // Umbrales de transición automática entre niveles por sendero (sin return para no detener el bucle)
+    if (currentLevel === 'france' && this.posX >= 91 && !isLevelTransitioning) {
+      switchLevel('tree');
+    } else if (currentLevel === 'tree' && this.posX <= 5 && !isLevelTransitioning) {
+      switchLevel('france');
+    }
 
-    // Salto y gravedad
+    // Límites del escenario según el nivel activo (evita que camine en el aire en Sakura)
+    const minLevelX = currentLevel === 'france' ? 5 : 6;
+    const maxLevelX = currentLevel === 'france' ? 94 : 84;
+    this.posX = Math.max(minLevelX, Math.min(maxLevelX, this.posX));
+
+    // Salto y gravedad con escala de tiempo
     if (!this.isGrounded) {
-      this.offsetY += this.velY;
-      this.velY += 0.65; // gravedad
+      this.offsetY += this.velY * timeScale;
+      this.velY += 0.65 * timeScale; // gravedad constante
 
       if (this.offsetY >= 0) {
         this.offsetY = 0;
@@ -732,8 +763,9 @@ class BeaCharacterController {
 
     // Partículas de pisadas
     if (movingNow && this.isGrounded) {
-      this.stepCounter++;
-      if (this.stepCounter % 14 === 0) {
+      this.stepCounter += timeScale;
+      if (this.stepCounter >= 22) {
+        this.stepCounter = 0;
         this.createDust();
       }
     }
@@ -747,7 +779,7 @@ class BeaCharacterController {
     this.el.classList.toggle('jumping', !this.isGrounded);
     this.el.classList.toggle('facing-left', this.facing === 'left');
 
-    // Actualizar animación de sprites auténtica (caminado cuadro por cuadro)
+    // Actualizar animación de sprites auténtica (caminado cuadro por cuadro a ritmo pausado)
     if (!this.spriteImg || !this.spriteImg.isConnected) {
       this.spriteImg = this.el?.querySelector('.bea-sprite-img') || document.getElementById('bea-sprite-img');
     }
@@ -763,9 +795,9 @@ class BeaCharacterController {
           this.currentFrameSrc = firstSrc;
         }
       } else {
-        this.walkTick++;
-        // Cambiar de fotograma cada 7 ticks (~115ms a 60 FPS)
-        if (this.walkTick >= 7) {
+        this.walkTick += timeScale;
+        // Cambiar de fotograma cada 10 ticks (~166ms a 60 FPS) para un paso pausado y natural
+        if (this.walkTick >= 10) {
           this.walkTick = 0;
           this.walkFrameIndex = (this.walkFrameIndex + 1) % BEA_SPRITES.walk.length;
           const nextSrc = BEA_SPRITES.walk[this.walkFrameIndex];
@@ -787,7 +819,7 @@ class BeaCharacterController {
 
     this.checkProximity();
 
-    requestAnimationFrame(() => this.animate());
+    this.animFrameId = requestAnimationFrame(() => this.animate());
   }
 }
 
@@ -827,13 +859,28 @@ function switchLevel(targetLevel) {
     if (charEl && sakuraStage && !sakuraStage.contains(charEl)) {
       sakuraStage.appendChild(charEl);
     }
-    if (beaController) {
-      beaController.posX = 10;
-      beaController.targetPosX = null;
-      setTimeout(() => beaController.jump(), 280);
-    }
 
     currentLevel = 'tree';
+
+    if (beaController) {
+      beaController.posX = 10;
+      beaController.offsetY = 0;
+      beaController.velY = 0;
+      beaController.isGrounded = true;
+      beaController.targetPosX = null;
+      beaController.keys.left = false;
+      beaController.keys.right = false;
+      beaController.keys.jump = false;
+      beaController.facing = 'right';
+      beaController.lastTime = performance.now();
+
+      // Aplicar inmediatamente la nueva posición al elemento en el DOM
+      beaController.el.style.left = '10%';
+      beaController.el.style.transform = 'translateX(-50%) translateY(0px)';
+      beaController.el.classList.remove('facing-left', 'walking', 'jumping');
+      beaController.el.classList.add('idle');
+      beaController.checkProximity();
+    }
   } else {
     audioSynth.playChime();
     audioSynth.stopSakuraBgm();
@@ -856,21 +903,36 @@ function switchLevel(targetLevel) {
     if (charEl && franceStage && !franceStage.contains(charEl)) {
       franceStage.appendChild(charEl);
     }
-    if (beaController) {
-      beaController.posX = 84;
-      beaController.targetPosX = null;
-      setTimeout(() => beaController.jump(), 280);
-    }
 
     currentLevel = 'france';
+
+    if (beaController) {
+      beaController.posX = 84;
+      beaController.offsetY = 0;
+      beaController.velY = 0;
+      beaController.isGrounded = true;
+      beaController.targetPosX = null;
+      beaController.keys.left = false;
+      beaController.keys.right = false;
+      beaController.keys.jump = false;
+      beaController.facing = 'left';
+      beaController.lastTime = performance.now();
+
+      // Aplicar inmediatamente al DOM
+      beaController.el.style.left = '84%';
+      beaController.el.style.transform = 'translateX(-50%) translateY(0px)';
+      beaController.el.classList.add('facing-left', 'idle');
+      beaController.el.classList.remove('walking', 'jumping');
+      beaController.checkProximity();
+    }
   }
 
   setTimeout(() => {
     isLevelTransitioning = false;
     if (beaController) {
-      beaController.animate();
+      beaController.lastTime = performance.now();
     }
-  }, 600);
+  }, 500);
 }
 
 /* ==========================================================================
